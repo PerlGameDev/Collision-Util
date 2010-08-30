@@ -9,10 +9,13 @@ BEGIN {
     our @EXPORT_OK = qw( 
             check_contains check_contains_rect 
             check_collision check_collision_rect
+            check_collision_interval check_collision_axis
     );
     our %EXPORT_TAGS = (
         all => \@EXPORT_OK,
         std => [qw( check_contains check_collision )],
+        axis => [qw( check_collision_axis )],
+        interval => [qw( check_collision_interval )], 
     );
 }
 
@@ -103,6 +106,179 @@ sub check_collision {
     return wantarray ? @ret : $ret[0];
 }
 
+sub check_collision_interval {
+    my ($self, $target, $interval) = @_;
+
+    Carp::croak "must receive a target"
+        unless $target;
+    Carp::croak "must receive interval"
+        unless $interval;
+
+    my @ret = ();
+    my $ref = ref $target;
+    if ($ref eq 'ARRAY') {
+        my $id = 0;
+        foreach (@$target) {
+            my $axis = _check_collision_interval($self, $_, $interval);
+            if ($axis->[0] != 0 || $axis->[1] != 0) {
+                push(@ret, [$id, $axis]);
+                last unless wantarray;
+            }
+            $id++;
+        }
+    } elsif ($ref eq 'HASH') {
+        foreach (keys(%$target)) {
+            my $axis = _check_collision_interval($self, $target->{$_}, $interval);
+            if ($axis->[0] != 0 || $axis->[1] != 0) {
+                push(@ret, [$_, $axis]);
+                last unless wantarray;
+            }
+        }
+    } else {
+        return _check_collision_interval($self, $target, $interval);
+    }
+    if ($#ret < 0) {
+        push(@ret, [-1, [0, 0]]);
+    }
+    return wantarray ? @ret : $ret[0];
+}
+
+sub _check_collision_interval {
+    my ($self, $target, $interval) = @_;
+    
+    Carp::croak "must receive a target"
+        unless $target;
+    Carp::croak "must receive interval"
+        unless $interval;
+
+    my $axis = [0, 0];
+    eval {
+        # store original positions
+        my ($x1, $y1, $x2, $y2);
+        $x1 = $self->x;
+        $y1 = $self->y;
+        $x2 = $target->x;
+        $y2 = $target->y;
+        for (1..$interval) {
+            # move to next position
+            $self->x($self->x + $self->v_x);
+            $self->y($self->y + $self->v_y);
+            $target->x($target->x + $target->v_x);
+            $target->y($target->y + $target->v_y);
+            $axis = check_collision_axis_rect($self, $target);
+            if ($axis->[0] != 0 or $axis->[1] != 0) {
+                last;
+            } else {
+                # do this debugging for now. TODO: remove later :)
+                my $c = check_collision_rect($self, $target);
+                if ($c) {
+                    print "axis collision not detected, but rects collide!?\n";
+                    print "size of target: ", $target->w, "x", $target->h,"\n";
+                    printf "self: (%d : %d, %d : %d) target: (%d : %d, %d : %d)\n",
+                        $self->x, $self->x+$self->w, $self->y, $self->y+$self->h,
+                        $target->x, $target->x+$target->w, $target->y, $target->y+$target->h;
+                }
+            }
+        }
+        # restore
+        $self->x($x1);
+        $self->y($y1);
+        $target->x($x2);
+        $target->y($y2);
+    };
+    Carp::croak "elements should have x, y, w, h, v_x and v_y accessors: $@" if $@;
+    return $axis;
+}
+
+sub check_collision_axis {
+    my ($self, $target) = @_;
+
+    Carp::croak "must receive a target"
+        unless $target;
+    
+    my @ret = ();
+    my $ref = ref $target;
+    if ($ref eq 'ARRAY') {
+        my $id = 0;
+        foreach (@$target) {
+            my $axis = check_collision_axis_rect($self, $_);
+            if ($axis->[0] != 0 || $axis->[1] != 0) {
+                push(@ret, [$id, $axis]);
+                last unless wantarray;
+            }
+            $id++;
+        }
+    } elsif ($ref eq 'HASH') {
+        foreach (keys(%$target)) {
+            my $axis = check_collision_axis_rect($self, $target->{$_});
+            if ($axis->[0] != 0 || $axis->[1] != 0) {
+                push(@ret, [$_, $axis]);
+                last unless wantarray;
+            }
+        }
+    } else {
+        return _check_collision_interval($self, $target);
+    }
+    if ($#ret < 0) {
+        push(@ret, [-1, [0, 0]]);
+    }
+    return wantarray ? @ret : $ret[0];
+
+}
+
+sub check_collision_axis_rect {
+    my ($self, $target) = @_;
+
+    Carp::croak "must receive a target"
+        unless $target;
+
+    my $axis = [0, 0];
+    eval {
+        # x-axis left
+        # x <= x2+w2 <= x+w/2
+        # y <  y2+h2
+        # y2<  y+h
+        if (($self->x + $self->w >= $target->x) &&
+            ($self->x + $self->w <= $target->x + $target->w / 2) &&
+            ($self->y + $self->h >=  $target->y) &&
+            ($self->y <= $target->y + $target->h)) {
+            $axis->[0] = -1;
+        }
+        # x-axis right
+        # x+w/2 <= x2 <= x+w
+        # y     <  y2+h2
+        # y2    <  y+h
+        elsif (($self->x >= $target->x + $target->w / 2) &&
+            ($self->x <= $target->x + $target->w) &&
+            ($self->y + $self->h >=  $target->y) &&
+            ($self->y <=  $target->y + $target->h)) {
+            $axis->[0] = 1;
+        }
+        # y-axis top
+        # y <= y2+h2 <= y+h/2
+        # x <  x2+w2
+        # x2<  x+w
+        if (($self->y + $self->h >= $target->y) &&
+            ($self->y + $self->h <= $target->y + $target->h / 2) &&
+            ($self->x + $self->w >=  $target->x) &&
+            ($self->x <= $target->x + $target->w)) {
+            $axis->[1] = 1;
+        }
+        # y-axis bottom
+        # y+h <= y2 <= y+h/2
+        # x   <  x2+w2
+        # x2  <  x+w
+        elsif (($self->y >= $target->y + $target->h / 2) &&
+            ($self->y <= $target->y + $target->h) &&
+            ($self->x + $self->w >= $target->x) &&
+            ($self->x <= $target->x + $target->w)) {
+            $axis->[1] = -1;
+        }
+    };
+    Carp::croak "elements should have x, y, w, h, v_x and v_y accessors" if $@;
+    return $axis;
+}
+
 sub check_collision_rect {
     Carp::croak "must receive a target"
         unless $_[1];
@@ -163,6 +339,7 @@ detection into your objects:
   use Class::XSAccessor {
       constructor => 'new',
       accessors   => [ 'x', 'y', 'w', 'h' ],
+      # use ['x', 'y', 'w', 'h', 'v_x', 'v_y'] for interval collisions
   };
   
   # if your class has the (x, y, w, h) accessors,
@@ -181,6 +358,34 @@ Then, further in your code:
   # you can also check if them all in a single run:
   $rect1->check_collision( [$rect2, $rect3] );
 
+And something else, with intervals:
+
+  my $player = CollisionBlock->new(x => 100, y => 50, w => 25, h => 25, v_x => 0, v_y => 10);
+  my $wall   = [
+      CollisionBlock->new(x => 100, y => 100, w => 30, h => 30, v_x => 0, v_y => 0),
+      CollisionBlock->new(x => 130, y => 100, w => 30, h => 30, v_x => 0, v_y => 0),
+      CollisionBlock->new(x => 160, y => 100, w => 30, h => 30, v_x => 0, v_y => 0),
+  ];
+
+  print "collision in 4 steps on y-axis\n";
+  print Dumper $player->check_collision_interval($wall,  4);
+
+  # set another position
+  $player->x(67);
+  $player->y(102);
+  $player->v_y(2);
+  $player->v_x(9);
+  print "collision at next step on x-axis\n";
+  print Dumper $player->check_collision_interval($wall, 1);
+
+  # set another position
+  $player->x(213);
+  $player->y(180);
+  $player->v_x(-2.5);
+  $player->v_y(-5.8);
+  print "collision over some time on x-axis at (188,122)\n";
+  my $coll = $player->check_collision_interval($wall, 11);
+  print Dumper $coll;
 
 =head1 DESCRIPTION
 
@@ -200,6 +405,14 @@ exports C<< check_collision() >> and C<< check_contains() >>.
 =head2 :rect
 
 exports C<< check_collision_rect() >> and C<< check_contains_rect() >>.
+
+=head2 :interval
+
+exports C<< check_collision_interval() >>.
+
+=head2 :axis
+
+exports C<< check_collision_axis() >>.
 
 =head2 :circ
 
@@ -270,6 +483,85 @@ Similarly, you can also check which (if any) elements of a hash are colliding
 with your element, which is useful if you group your objects like that instead 
 of in a list.
 
+=head2 check_collision_axis ($source, $target)
+
+=head2 check_collision_axis ($source, [$target1, $target2, $target3, ...])
+
+=head2 check_collision_axis ($source, { key1 => $target1, key2 => $target2, ...})
+
+  my $axis = check_collision_axis($player, $stone);
+  if ($axis->[0] != 0) {
+      # x-axis collision
+  }
+  if ($axis->[1] != 0) {
+      # y-axis collision
+      if ($axis->[1] == -1) {
+          # from above
+      } elsif ($axis->[1] == 1) {
+          # from below
+      }
+  }
+
+Always returns collisions as array references representing the collision axis' ([x, y],
+values -1, 0 or 1).
+
+  my @hits = check_collision_axis($planet, \@asteroids);
+
+  foreach my $hit (@hits) {
+        if ($hit->[0] != 0) {
+            # x-axis collision
+        }
+  }
+
+If your code context wants it to return a list, C<< inside >> will return a
+list of all indices that collide with $source. If no elements are found, an
+empty list is returned with the index value set to -1.
+
+  my @keys = check_collision_axis($foo, \%bar);
+
+Similarly, you can also check which (if any) elements of a hash are colliding
+with your element, which is useful if you group your objects like that instead 
+of in a list.
+
+=head2 check_collision_interval ($source, $target)
+
+=head2 check_collision_interval ($source, [$target1, $target2, $target3, ...])
+
+=head2 check_collision_interval ($source, { key1 => $target1, key2 => $target2, ...})
+
+  my $collision = check_collision_interval($player, $stone, 1);
+  if ($collision->[0] != 0) {
+      # x-axis collision
+  }
+  if ($collision->[1] != 0) {
+      # y-axis collision
+      if ($collision->[1] == -1) {
+          # from above
+      } elsif ($collision->[1] == 1) {
+          # from below
+      }
+  }
+
+Always returns collisions as array references representing the collision axis' ([x, y],
+values -1, 0 or 1).
+
+  my @hits = check_collision_interval($planet, \@asteroids, 10);
+
+  foreach my $hit (@hits) {
+        if ($hit->[0] != 0) {
+            # x-axis collision
+        }
+  }
+
+If your code context wants it to return a list, C<< inside >> will return a
+list of all indices that collide with $source. If no elements are found, an
+empty list is returned with the index value set to -1.
+
+  my @keys = check_collision_interval($foo, \%bar, 2);
+
+Similarly, you can also check which (if any) elements of a hash are colliding
+with your element, which is useful if you group your objects like that instead 
+of in a list.
 
 =head1 USING IT IN YOUR OBJECTS
 
@@ -296,9 +588,10 @@ Both C<$source> and C<$target> must be objects with accessors for C<x>
 =back
 
 
-=head1 AUTHOR
+=head1 AUTHORS
 
 Breno G. de Oliveira, C<< <garu at cpan.org> >>
+Heikki MehtE<195>nen, C<< <heikki at mehtanen.fi> >>
 
 
 =head1 ACKNOWLEDGEMENTS
