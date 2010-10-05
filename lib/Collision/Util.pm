@@ -349,15 +349,6 @@ sub check_collision_interval_axis_rect {
                     }
                 }
             } else {
-                # Check if (x1, y1)-(x1, y2) intersects the side
-
-                # y = m * x + b
-                # b = y - m * x
-                #
-                # y1 - y2 = (m * x1 + b) - (m * x2 + b)
-                # y1 - y2 = m * (x1 - x2)
-                # m = (y1 - y2) / (x1 - x2) 
-
                 my $m = ($start[0]->[1] - $end[0]->[1]) / ($start[0]->[0] - $end[0]->[0]);
 
                 foreach my $idx (0, 1) {
@@ -405,9 +396,6 @@ sub check_collision_interval_axis_rect {
 
                     my $b = $start->[1] - $m * $start->[0];
 
-                    # y = m * x + b
-                    # m * x = y - b
-                    # x = (y - b) / m
                     my $x = ($side[0]->[1] - $b) / $m;
 
                     if ($x >= $side[0]->[0] && $x <= $side[1]->[0]) {
