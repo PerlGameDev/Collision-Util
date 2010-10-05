@@ -333,28 +333,36 @@ sub check_collision_interval_axis_rect {
         # x-axis checks
         if ($v_x != 0) {
             my $direction = $v_x <=> 0;
-            my @side  = $v_x > 0 ? @target_corners[0, 3] : @target_corners[1, 2];
-            my @start = $v_x > 0 ? @start_corners[1, 2]  : @start_corners[0, 3];
-            my @end   = $v_x > 0 ? @end_corners[1, 2]    : @end_corners[0, 3];
 
-            foreach my $idx (0, 1) {
-                my ($start, $end) = ($start[$idx], $end[$idx]);
+            my (@start, @end, $s_x1, $s_y1, $s_x2, $s_y2);
 
-                next if $direction == ($start->[0] <=> $side[0]->[0]) ||
-                    $direction != ($end->[0] <=> $side[0]->[0]);
+            if ($direction == 1) {
+                ($s_x1, $s_y1, $s_x2, $s_y2) = map { @$_ } @target_corners[0, 3];
+                @start = @start_corners[1, 2];
+                @end   = @end_corners[1, 2];
+            } else {
+                ($s_x1, $s_y1, $s_x2, $s_y2) = map { @$_ } @target_corners[1, 2];
+                @start = @start_corners[0, 3];
+                @end   = @end_corners[0, 3];
+            }
+
+            foreach my $i (0, 1) {
+                my ($x1, $y1, $x2, $y2) = map { @$_ } ($start[$i], $end[$i]);
+
+                next if $direction == ($x1 <=> $s_x1) || $direction != ($x2 <=> $s_x1);
 
                 if ($v_y == 0) {
-                    if ($end->[1] >= $side[0]->[1] && $end->[1] <= $side[1]->[1]) {
+                    if ($y2 >= $s_y1 && $y2 <= $s_y2) {
                         $axis->[0] = -$direction;
                         last;
                     }
                 } else {
-                    my $m = ($start[0]->[1] - $end[0]->[1]) / ($start[0]->[0] - $end[0]->[0]);
+                    my $m = ($y1 - $y2) / ($x1 - $x2);
 
-                    my $b = $start->[1] - $m * $start->[0];
-                    my $y = $m * $side[0]->[0] + $b;
+                    my $b = $y1 - $m * $x1;
+                    my $y = $m * $s_x1 + $b;
 
-                    if ($y >= $side[0]->[1] && $y <= $side[1]->[1]) {
+                    if ($y >= $s_y1 && $y <= $s_y2) {
                         $axis->[0] = -$direction;
                         last;
                     }
@@ -365,29 +373,37 @@ sub check_collision_interval_axis_rect {
         # y-axis checks
         if ($v_y != 0) {
             my $direction = $v_y <=> 0;
-            my @side  = $v_y > 0 ? @target_corners[0, 1] : @target_corners[3, 2];
-            my @start = $v_y > 0 ? @start_corners[2, 3]  : @start_corners[0, 1];
-            my @end   = $v_y > 0 ? @end_corners[2, 3]    : @end_corners[0, 1];
+  
+            my (@start, @end, $s_x1, $s_y1, $s_x2, $s_y2);
 
-            foreach my $idx (0, 1) {
-                my ($start, $end) = ($start[$idx], $end[$idx]);
+            if ($direction == 1) {
+                ($s_x1, $s_y1, $s_x2, $s_y2) = map { @$_ } @target_corners[0, 1];
+                @start = @start_corners[2, 3];
+                @end   = @end_corners[2, 3];
+            } else {
+                ($s_x1, $s_y1, $s_x2, $s_y2) = map { @$_ } @target_corners[3, 2];
+                @start = @start_corners[0, 1];
+                @end   = @end_corners[0, 1];
+            }
 
-                next if $direction == ($start->[1] <=> $side[0]->[1]) ||
-                    $direction != ($end->[1] <=> $side[0]->[1]);
+            foreach my $i (0, 1) {
+                my ($x1, $y1, $x2, $y2) = map { @$_ } ($start[$i], $end[$i]);
+
+                next if $direction == ($y1 <=> $s_y1) || $direction != ($y2 <=> $s_y1);
 
                 if ($v_x == 0) {
-                    if ($end->[0] >= $side[0]->[0] && $end->[0] <= $side[1]->[0]) {
+                    if ($x2 >= $s_x1 && $x2 <= $s_x2) {
                         $axis->[1] = $direction;
                         last;
                     }
                 } else {
-                    my $m = ($start[0]->[1] - $end[0]->[1]) / ($start[0]->[0] - $end[0]->[0]);
+                    my $m = ($y1 - $y2) / ($x1 - $x2);
 
-                    my $b = $start->[1] - $m * $start->[0];
+                    my $b = $y1 - $m * $x1;
 
-                    my $x = ($side[0]->[1] - $b) / $m;
+                    my $x = ($s_y1 - $b) / $m;
 
-                    if ($x >= $side[0]->[0] && $x <= $side[1]->[0]) {
+                    if ($x >= $s_x1 && $x <= $s_x2) {
                         $axis->[1] = $direction;
                         last;
                     }
