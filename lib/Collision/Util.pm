@@ -329,25 +329,18 @@ sub check_collision_interval_axis_rect {
             my @start = $v_x > 0 ? @start_corners[1, 2]  : @start_corners[0, 3];
             my @end   = $v_x > 0 ? @end_corners[1, 2]    : @end_corners[0, 3];
 
-            if ($v_y == 0) {
-                foreach my $idx (0, 1) {
-                    my ($start, $end) = ($start[$idx], $end[$idx]);
+            foreach my $idx (0, 1) {
+                my ($start, $end) = ($start[$idx], $end[$idx]);
 
-                    next if $direction == ($start->[0] <=> $side[0]->[0]) ||
-                        $direction != ($end->[0] <=> $side[0]->[0]);
+                next if $direction == ($start->[0] <=> $side[0]->[0]) ||
+                    $direction != ($end->[0] <=> $side[0]->[0]);
 
+                if ($v_y == 0) {
                     if ($end->[1] >= $side[0]->[1] && $end->[1] <= $side[1]->[1]) {
                         $axis->[0] = -$direction;
                     }
-                }
-            } else {
-                my $m = ($start[0]->[1] - $end[0]->[1]) / ($start[0]->[0] - $end[0]->[0]);
-
-                foreach my $idx (0, 1) {
-                    my ($start, $end) = ($start[$idx], $end[$idx]);
-
-                    next if $direction == ($start->[0] <=> $side[0]->[0]) ||
-                        $direction != ($end->[0] <=> $side[0]->[0]);
+                } else {
+                    my $m = ($start[0]->[1] - $end[0]->[1]) / ($start[0]->[0] - $end[0]->[0]);
 
                     my $b = $start->[1] - $m * $start->[0];
                     my $y = $m * $side[0]->[0] + $b;
@@ -366,25 +359,18 @@ sub check_collision_interval_axis_rect {
             my @start = $v_y > 0 ? @start_corners[2, 3]  : @start_corners[0, 1];
             my @end   = $v_y > 0 ? @end_corners[2, 3]    : @end_corners[0, 1];
 
-            if ($v_x == 0) {
-                foreach my $idx (0, 1) {
-                    my ($start, $end) = ($start[$idx], $end[$idx]);
+            foreach my $idx (0, 1) {
+                my ($start, $end) = ($start[$idx], $end[$idx]);
 
-                    next if $direction == ($start->[1] <=> $side[0]->[1]) ||
-                        $direction != ($end->[1] <=> $side[0]->[1]);
+                next if $direction == ($start->[1] <=> $side[0]->[1]) ||
+                    $direction != ($end->[1] <=> $side[0]->[1]);
 
+                if ($v_x == 0) {
                     if ($end->[0] >= $side[0]->[0] && $end->[0] <= $side[1]->[0]) {
                         $axis->[1] = $direction;
                     }
-                }
-            } else {
-                my $m = ($start[0]->[1] - $end[0]->[1]) / ($start[0]->[0] - $end[0]->[0]);
-
-                foreach my $idx (0, 1) {
-                    my ($start, $end) = ($start[$idx], $end[$idx]);
-
-                    next if $direction == ($start->[1] <=> $side[0]->[1]) ||
-                        $direction != ($end->[1] <=> $side[0]->[1]);
+                } else {
+                    my $m = ($start[0]->[1] - $end[0]->[1]) / ($start[0]->[0] - $end[0]->[0]);
 
                     my $b = $start->[1] - $m * $start->[0];
 
