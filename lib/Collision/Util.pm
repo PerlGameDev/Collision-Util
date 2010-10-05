@@ -346,6 +346,7 @@ sub check_collision_interval_axis_rect {
                 if ($v_y == 0) {
                     if ($end->[1] >= $side[0]->[1] && $end->[1] <= $side[1]->[1]) {
                         $axis->[0] = -$direction;
+                        last;
                     }
                 } else {
                     my $m = ($start[0]->[1] - $end[0]->[1]) / ($start[0]->[0] - $end[0]->[0]);
@@ -355,6 +356,7 @@ sub check_collision_interval_axis_rect {
 
                     if ($y >= $side[0]->[1] && $y <= $side[1]->[1]) {
                         $axis->[0] = -$direction;
+                        last;
                     }
                 }
             }
@@ -376,6 +378,7 @@ sub check_collision_interval_axis_rect {
                 if ($v_x == 0) {
                     if ($end->[0] >= $side[0]->[0] && $end->[0] <= $side[1]->[0]) {
                         $axis->[1] = $direction;
+                        last;
                     }
                 } else {
                     my $m = ($start[0]->[1] - $end[0]->[1]) / ($start[0]->[0] - $end[0]->[0]);
@@ -386,6 +389,7 @@ sub check_collision_interval_axis_rect {
 
                     if ($x >= $side[0]->[0] && $x <= $side[1]->[0]) {
                         $axis->[1] = $direction;
+                        last;
                     }
                 }
             }
