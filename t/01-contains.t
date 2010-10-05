@@ -4,10 +4,10 @@ use warnings;
 
 package Rect;
   sub new { my $class = shift; return bless {@_}, $class }
-  sub x { $_[0]->{x} = $_[1] if $_[1]; return $_[0]->{x} }
-  sub y { $_[0]->{y} = $_[1] if $_[1]; return $_[0]->{y} }
-  sub w { $_[0]->{w} = $_[1] if $_[1]; return $_[0]->{w} }
-  sub h { $_[0]->{h} = $_[1] if $_[1]; return $_[0]->{h} }
+  sub x { $_[0]->{x} = $_[1] if defined $_[1]; return $_[0]->{x} }
+  sub y { $_[0]->{y} = $_[1] if defined $_[1]; return $_[0]->{y} }
+  sub w { $_[0]->{w} = $_[1] if defined $_[1]; return $_[0]->{w} }
+  sub h { $_[0]->{h} = $_[1] if defined $_[1]; return $_[0]->{h} }
 
 package main;
 
