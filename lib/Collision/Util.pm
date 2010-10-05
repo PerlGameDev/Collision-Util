@@ -160,15 +160,15 @@ sub _check_collision_interval {
         $x2 = $target->x;
         $y2 = $target->y;
         for (1..$interval) {
-            # move to next position
-            $self->x($self->x + $self->v_x);
-            $self->y($self->y + $self->v_y);
-            $target->x($target->x + $target->v_x);
-            $target->y($target->y + $target->v_y);
-            $axis = check_collision_axis_rect($self, $target);
+            $axis = check_collision_interval_axis_rect($self, $target);
             if ($axis->[0] != 0 or $axis->[1] != 0) {
                 last;
             } else {
+                # move to next position
+                $self->x($self->x + $self->v_x);
+                $self->y($self->y + $self->v_y);
+                $target->x($target->x + $target->v_x);
+                $target->y($target->y + $target->v_y);
                 # do this debugging for now. TODO: remove later :)
                 my $c = check_collision_rect($self, $target);
                 if ($c) {
@@ -284,6 +284,140 @@ sub check_collision_axis_rect {
         }
     };
     Carp::croak "elements should have x, y, w, h, v_x and v_y accessors" if $@;
+    return $axis;
+}
+
+sub check_collision_interval_axis_rect {
+    my ($self, $target) = @_;
+
+    Carp::croak "must receive a target"
+        unless $target;
+
+    my $axis = [0, 0];
+    eval {
+        # Use relative velocities to simplify calculations
+        my $v_x = $self->v_x - $target->v_x;
+        my $v_y = $self->v_y - $target->v_y;
+
+        return $axis if $v_x == 0 && $v_y == 0;
+
+        # Starting points
+        my $x1 = $self->x;
+        my $y1 = $self->y;
+
+        my @start_corners = (
+            [$x1,            $y1],
+            [$x1 + $self->w, $y1],
+            [$x1 + $self->w, $y1 + $self->h],
+            [$x1,            $y1 + $self->h],
+        );
+
+        # Relative endpoints
+        my $x2 = $self->x + $v_x;
+        my $y2 = $self->y + $v_y;
+
+        my @end_corners = (
+            [$x2,            $y2],
+            [$x2 + $self->w, $y2],
+            [$x2 + $self->w, $y2 + $self->h],
+            [$x2,            $y2 + $self->h],
+        );
+
+        my @target_corners = (
+            [$target->x,              $target->y],
+            [$target->x + $target->w, $target->y],
+            [$target->x + $target->w, $target->y + $target->h],
+            [$target->x,              $target->y + $target->h],
+        );
+
+        # x-axis checks
+        if ($v_x != 0) {
+            my $direction = $v_x <=> 0;
+            my @side  = $v_x > 0 ? @target_corners[0, 3] : @target_corners[1, 2];
+            my @start = $v_x > 0 ? @start_corners[1, 2]  : @start_corners[0, 3];
+            my @end   = $v_x > 0 ? @end_corners[1, 2]    : @end_corners[0, 3];
+
+            if ($v_y == 0) {
+                foreach my $idx (0, 1) {
+                    my ($start, $end) = ($start[$idx], $end[$idx]);
+
+                    next if $direction == ($start->[0] <=> $side[0]->[0]) ||
+                        $direction != ($end->[0] <=> $side[0]->[0]);
+
+                    if ($end->[1] >= $side[0]->[1] && $end->[1] <= $side[1]->[1]) {
+                        $axis->[0] = -$direction;
+                    }
+                }
+            } else {
+                # Check if (x1, y1)-(x1, y2) intersects the side
+
+                # y = m * x + b
+                # b = y - m * x
+                #
+                # y1 - y2 = (m * x1 + b) - (m * x2 + b)
+                # y1 - y2 = m * (x1 - x2)
+                # m = (y1 - y2) / (x1 - x2) 
+
+                my $m = ($start[0]->[1] - $end[0]->[1]) / ($start[0]->[0] - $end[0]->[0]);
+
+                foreach my $idx (0, 1) {
+                    my ($start, $end) = ($start[$idx], $end[$idx]);
+
+                    next if $direction == ($start->[0] <=> $side[0]->[0]) ||
+                        $direction != ($end->[0] <=> $side[0]->[0]);
+
+                    my $b = $start->[1] - $m * $start->[0];
+                    my $y = $m * $side[0]->[0] + $b;
+
+                    if ($y >= $side[0]->[1] && $y <= $side[1]->[1]) {
+                        $axis->[0] = -$direction;
+                    }
+                }
+            }
+        }
+
+        # y-axis checks
+        if ($v_y != 0) {
+            my $direction = $v_y <=> 0;
+            my @side  = $v_y > 0 ? @target_corners[0, 1] : @target_corners[3, 2];
+            my @start = $v_y > 0 ? @start_corners[2, 3]  : @start_corners[0, 1];
+            my @end   = $v_y > 0 ? @end_corners[2, 3]    : @end_corners[0, 1];
+
+            if ($v_x == 0) {
+                foreach my $idx (0, 1) {
+                    my ($start, $end) = ($start[$idx], $end[$idx]);
+
+                    next if $direction == ($start->[1] <=> $side[0]->[1]) ||
+                        $direction != ($end->[1] <=> $side[0]->[1]);
+
+                    if ($end->[0] >= $side[0]->[0] && $end->[0] <= $side[1]->[0]) {
+                        $axis->[1] = $direction;
+                    }
+                }
+            } else {
+                my $m = ($start[0]->[1] - $end[0]->[1]) / ($start[0]->[0] - $end[0]->[0]);
+
+                foreach my $idx (0, 1) {
+                    my ($start, $end) = ($start[$idx], $end[$idx]);
+
+                    next if $direction == ($start->[1] <=> $side[0]->[1]) ||
+                        $direction != ($end->[1] <=> $side[0]->[1]);
+
+                    my $b = $start->[1] - $m * $start->[0];
+
+                    # y = m * x + b
+                    # m * x = y - b
+                    # x = (y - b) / m
+                    my $x = ($side[0]->[1] - $b) / $m;
+
+                    if ($x >= $side[0]->[0] && $x <= $side[1]->[0]) {
+                        $axis->[1] = $direction;
+                    }
+                }
+            }
+        }
+    };
+    Carp::croak "elements should have x, y, w, h, v_x and v_y accessors: $@" if $@;
     return $axis;
 }
 
