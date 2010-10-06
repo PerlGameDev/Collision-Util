@@ -287,6 +287,23 @@ sub check_collision_axis_rect {
     return $axis;
 }
 
+
+# _check_collision_interval_axis_side( [ [$x1, $x2], ... ],
+#   [ [$s_x1, $s_y1], [$s_x2, $s_y2]], [$v_x, $v_y] );
+#
+# Check if any of a set of points moving with the same velocity collide
+# with a stationary vertical line.
+#
+# Assumptions:
+#   The line is vertical ($s_x1 == $s_x2)
+#   The first point of the line is below the second ($s_y2 > $s_y1)
+#
+# Return Value:
+#    0 if there are no collisions.
+#    1 if any point collides with the right side of the line.
+#   -1 if any point collides with the left side of the line.
+#
+# TODO: Think of a better name for this function
 sub _check_collision_interval_axis_side {
     my ($points, $side, $v) = @_;
 
@@ -319,6 +336,12 @@ sub _check_collision_interval_axis_side {
     return 0;
 }
 
+# This implementation relies on the fact if two rectangles with the same
+# orientation collide (in this case the sides are parallel to the x-axis
+# and y-axis) one or both corners of the smaller side involved in the
+# collision collides with the larger side involved in the collision.
+# Therefore, only these corners are checked for a collision with
+# whichever side it is possible for them to collide with.
 sub _check_collision_interval_axis_rect {
     my ($self, $target) = @_;
 
@@ -327,7 +350,10 @@ sub _check_collision_interval_axis_rect {
 
     my $axis = [0, 0];
     eval {
-        # Use relative velocities to simplify calculations
+        # Use relative velocities to simplify calculations.
+        # This changes the frame of reference so that the target is
+        # treated as if it is stationary and self has the combined
+        # relative velocity of both rectangles.
         my $v_x = $self->v_x - $target->v_x;
         my $v_y = $self->v_y - $target->v_y;
 
@@ -351,6 +377,13 @@ sub _check_collision_interval_axis_rect {
 
             my @v = ($v_x, $v_y);
 
+            # The smallest side must be first.  If the height of self is
+            # larger than the height of target, reverse the sides and
+            # negate the velocities.  This changes the frame of
+            # reference so that self is treated as if it is stationary
+            # and the target has the combined relative velocity of both
+            # rectangles.  Negate the result of the helper function,
+            # since it is relative to target and not self.
             my $d = 1;
             if ($self->h > $target->h) {
                 $d     = -1;
@@ -367,6 +400,9 @@ sub _check_collision_interval_axis_rect {
                 ? ([@self_corners[2, 3]], [@target_corners[0, 1]])
                 : ([@self_corners[0, 1]], [@target_corners[3, 2]]);
 
+            # Reverse x and y coordinates and velocoties.
+            # This allows use of the same function that checks for
+            # collisions in the x-axis.
             @sides = map {
                 my @points = @$_;
                 [ map { [ reverse @$_ ] } @points ]
