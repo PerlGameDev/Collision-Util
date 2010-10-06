@@ -311,9 +311,7 @@ sub _check_collision_interval_axis_side {
             my $b = $y1 - $m * $x1;
             my $y = $m * $s_x1 + $b;
 
-            printf("sy = [%f %f], y = %f\n", $s_y1, $s_y2, $y);
             if ($y >= $s_y1 && $y <= $s_y2) {
-                printf("Returning %d\n", -$direction);
                 return -$direction;
             }
         }
