@@ -287,6 +287,40 @@ sub check_collision_axis_rect {
     return $axis;
 }
 
+sub _check_collision_interval_axis_side {
+    my ($points, $side, $v) = @_;
+
+    my ($s_x1, $s_y1) = @{ $side->[0] };
+    my ($s_x2, $s_y2) = @{ $side->[1] };
+    my ($v_x,  $v_y)  = @$v;
+
+    my $direction = $v_x <=> 0;
+
+    foreach my $point (@$points) {
+        my ($x1, $y1) = @$point;
+        my ($x2, $y2) = ($x1 + $v_x, $y1 + $v_y);
+
+        next if $direction == ($x1 <=> $s_x1) || $direction != ($x2 <=> $s_x1);
+
+        if ($v_y == 0) {
+            if ($y2 >= $s_y1 && $y2 <= $s_y2) {
+                return -$direction;
+            }
+        } else {
+            my $m = ($y1 - $y2) / ($x1 - $x2);
+            my $b = $y1 - $m * $x1;
+            my $y = $m * $s_x1 + $b;
+
+            printf("sy = [%f %f], y = %f\n", $s_y1, $s_y2, $y);
+            if ($y >= $s_y1 && $y <= $s_y2) {
+                printf("Returning %d\n", -$direction);
+                return -$direction;
+            }
+        }
+    }
+    return 0;
+}
+
 sub _check_collision_interval_axis_rect {
     my ($self, $target) = @_;
 
@@ -312,17 +346,6 @@ sub _check_collision_interval_axis_rect {
             [$x1,            $y1 + $self->h],
         );
 
-        # Relative endpoints
-        my $x2 = $self->x + $v_x;
-        my $y2 = $self->y + $v_y;
-
-        my @end_corners = (
-            [$x2,            $y2],
-            [$x2 + $self->w, $y2],
-            [$x2 + $self->w, $y2 + $self->h],
-            [$x2,            $y2 + $self->h],
-        );
-
         my @target_corners = (
             [$target->x,              $target->y],
             [$target->x + $target->w, $target->y],
@@ -334,81 +357,37 @@ sub _check_collision_interval_axis_rect {
         if ($v_x != 0) {
             my $direction = $v_x <=> 0;
 
-            my (@start, @end, $s_x1, $s_y1, $s_x2, $s_y2);
+            my (@start, @side);
 
             if ($direction == 1) {
-                ($s_x1, $s_y1, $s_x2, $s_y2) = map { @$_ } @target_corners[0, 3];
+                @side  = @target_corners[0, 3];
                 @start = @start_corners[1, 2];
-                @end   = @end_corners[1, 2];
             } else {
-                ($s_x1, $s_y1, $s_x2, $s_y2) = map { @$_ } @target_corners[1, 2];
+                @side  = @target_corners[1, 2];
                 @start = @start_corners[0, 3];
-                @end   = @end_corners[0, 3];
             }
 
-            foreach my $i (0, 1) {
-                my ($x1, $y1, $x2, $y2) = map { @$_ } ($start[$i], $end[$i]);
-
-                next if $direction == ($x1 <=> $s_x1) || $direction != ($x2 <=> $s_x1);
-
-                if ($v_y == 0) {
-                    if ($y2 >= $s_y1 && $y2 <= $s_y2) {
-                        $axis->[0] = -$direction;
-                        last;
-                    }
-                } else {
-                    my $m = ($y1 - $y2) / ($x1 - $x2);
-
-                    my $b = $y1 - $m * $x1;
-                    my $y = $m * $s_x1 + $b;
-
-                    if ($y >= $s_y1 && $y <= $s_y2) {
-                        $axis->[0] = -$direction;
-                        last;
-                    }
-                }
-            }
+            $axis->[0] = _check_collision_interval_axis_side(\@start, \@side, [$v_x, $v_y]);
         }
 
         # y-axis checks
         if ($v_y != 0) {
             my $direction = $v_y <=> 0;
-  
-            my (@start, @end, $s_x1, $s_y1, $s_x2, $s_y2);
+
+            my (@start, @side);
 
             if ($direction == 1) {
-                ($s_x1, $s_y1, $s_x2, $s_y2) = map { @$_ } @target_corners[0, 1];
+                @side  = @target_corners[0, 1];
                 @start = @start_corners[2, 3];
-                @end   = @end_corners[2, 3];
             } else {
-                ($s_x1, $s_y1, $s_x2, $s_y2) = map { @$_ } @target_corners[3, 2];
+                @side  = @target_corners[3, 2];
                 @start = @start_corners[0, 1];
-                @end   = @end_corners[0, 1];
             }
 
-            foreach my $i (0, 1) {
-                my ($x1, $y1, $x2, $y2) = map { @$_ } ($start[$i], $end[$i]);
+            @side = map { [ $_->[1], $_->[0] ] } @side;
+            @start = map { [ $_->[1], $_->[0] ] } @start;
 
-                next if $direction == ($y1 <=> $s_y1) || $direction != ($y2 <=> $s_y1);
-
-                if ($v_x == 0) {
-                    if ($x2 >= $s_x1 && $x2 <= $s_x2) {
-                        $axis->[1] = $direction;
-                        last;
-                    }
-                } else {
-                    my $m = ($y1 - $y2) / ($x1 - $x2);
-
-                    my $b = $y1 - $m * $x1;
-
-                    my $x = ($s_y1 - $b) / $m;
-
-                    if ($x >= $s_x1 && $x <= $s_x2) {
-                        $axis->[1] = $direction;
-                        last;
-                    }
-                }
-            }
+            $axis->[1] = -_check_collision_interval_axis_side(\@start, \@side, [$v_y, $v_x]);
         }
     };
     Carp::croak "elements should have x, y, w, h, v_x and v_y accessors: $@" if $@;
