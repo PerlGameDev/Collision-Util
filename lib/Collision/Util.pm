@@ -160,7 +160,7 @@ sub _check_collision_interval {
         $x2 = $target->x;
         $y2 = $target->y;
         for (1..$interval) {
-            $axis = check_collision_interval_axis_rect($self, $target);
+            $axis = _check_collision_interval_axis_rect($self, $target);
             if ($axis->[0] != 0 or $axis->[1] != 0) {
                 last;
             } else {
@@ -287,7 +287,7 @@ sub check_collision_axis_rect {
     return $axis;
 }
 
-sub check_collision_interval_axis_rect {
+sub _check_collision_interval_axis_rect {
     my ($self, $target) = @_;
 
     Carp::croak "must receive a target"
