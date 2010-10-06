@@ -353,39 +353,27 @@ sub _check_collision_interval_axis_rect {
 
         # x-axis checks
         if ($v_x != 0) {
-            my $direction = $v_x <=> 0;
 
-            my (@start, @side);
+            my @sides = ($v_x <=> 0) == 1
+                ? ([@start_corners[1, 2]], [@target_corners[0, 3]])
+                : ([@start_corners[0, 3]], [@target_corners[1, 2]]);
 
-            if ($direction == 1) {
-                @side  = @target_corners[0, 3];
-                @start = @start_corners[1, 2];
-            } else {
-                @side  = @target_corners[1, 2];
-                @start = @start_corners[0, 3];
-            }
-
-            $axis->[0] = _check_collision_interval_axis_side(\@start, \@side, [$v_x, $v_y]);
+            $axis->[0] = _check_collision_interval_axis_side(@sides, [$v_x, $v_y]);
         }
 
         # y-axis checks
         if ($v_y != 0) {
-            my $direction = $v_y <=> 0;
 
-            my (@start, @side);
+            my @sides = ($v_y <=> 0) == 1
+                ? ([@start_corners[2, 3]], [@target_corners[0, 1]])
+                : ([@start_corners[0, 1]], [@target_corners[3, 2]]);
 
-            if ($direction == 1) {
-                @side  = @target_corners[0, 1];
-                @start = @start_corners[2, 3];
-            } else {
-                @side  = @target_corners[3, 2];
-                @start = @start_corners[0, 1];
-            }
+            @sides = map {
+                my @points = @$_;
+                [ map { [ reverse @$_ ] } @points ]
+            } @sides;
 
-            @side = map { [ $_->[1], $_->[0] ] } @side;
-            @start = map { [ $_->[1], $_->[0] ] } @start;
-
-            $axis->[1] = -_check_collision_interval_axis_side(\@start, \@side, [$v_y, $v_x]);
+            $axis->[1] = -_check_collision_interval_axis_side(@sides, [$v_y, $v_x]);
         }
     };
     Carp::croak "elements should have x, y, w, h, v_x and v_y accessors: $@" if $@;
