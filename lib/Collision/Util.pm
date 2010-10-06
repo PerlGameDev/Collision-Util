@@ -352,7 +352,14 @@ sub _check_collision_interval_axis_rect {
 
             my @v = ($v_x, $v_y);
 
-            $axis->[0] = _check_collision_interval_axis_side(@sides, \@v);
+            my $d = 1;
+            if ($self->h > $target->h) {
+                $d     = -1;
+                @sides = reverse @sides;
+                @v     = map { -$_ } @v;
+            }
+
+            $axis->[0] = _check_collision_interval_axis_side(@sides, \@v) * $d;
         }
 
         # y-axis checks
@@ -369,7 +376,14 @@ sub _check_collision_interval_axis_rect {
 
             my @v = ($v_y, $v_x);
 
-            $axis->[1] = -_check_collision_interval_axis_side(@sides, \@v);
+            my $d = 1;
+            if ($self->w > $target->w) {
+                $d     = -1;
+                @sides = reverse @sides;
+                @v     = map { -$_ } @v;
+            }
+
+            $axis->[1] = -_check_collision_interval_axis_side(@sides, \@v) * $d;
         }
     };
     Carp::croak "elements should have x, y, w, h, v_x and v_y accessors: $@" if $@;
