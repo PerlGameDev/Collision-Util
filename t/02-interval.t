@@ -180,53 +180,50 @@ is_deeply($rect10->check_collision_interval($rect9, 1), [0, 0]);
 is_deeply($rect9->check_collision_interval($rect10, 2), [0, 1]);
 is_deeply($rect10->check_collision_interval($rect9, 2), [0, -1]);
 
-TODO: {
-    local $TODO = 'case not yet implemented';
-    #      +---+
-    # +--+ |12 |
-    # |11| |   |
-    # +--+ |   |
-    #      +---+
-    my $rect11 = Rect->new( x => 1, y => 1, w => 3, h => 2, v_x => 0, v_y => 0 );
-    my $rect12 = Rect->new( x => 6, y => 0, w => 4, h => 4, v_x => 0, v_y => 0 );
+#      +---+
+# +--+ |12 |
+# |11| |   |
+# +--+ |   |
+#      +---+
+my $rect11 = Rect->new( x => 1, y => 1, w => 3, h => 2, v_x => 0, v_y => 0 );
+my $rect12 = Rect->new( x => 6, y => 0, w => 4, h => 4, v_x => 0, v_y => 0 );
 
-    is_deeply($rect11->check_collision_interval($rect12, 1), [0, 0]);
-    is_deeply($rect12->check_collision_interval($rect11, 1), [0, 0]);
+is_deeply($rect11->check_collision_interval($rect12, 1), [0, 0]);
+is_deeply($rect12->check_collision_interval($rect11, 1), [0, 0]);
 
-    $rect11->v_x(3.0);
-    is_deeply($rect11->check_collision_interval($rect12, 1), [-1, 0]);
-    is_deeply($rect12->check_collision_interval($rect11, 1), [1, 0]);
+$rect11->v_x(3.0);
+is_deeply($rect11->check_collision_interval($rect12, 1), [-1, 0]);
+is_deeply($rect12->check_collision_interval($rect11, 1), [1, 0]);
 
-    $rect11->v_x(1.5);
-    is_deeply($rect11->check_collision_interval($rect12, 1), [0, 0]);
-    is_deeply($rect12->check_collision_interval($rect11, 1), [0, 0]);
-    is_deeply($rect11->check_collision_interval($rect12, 2), [-1, 0]);
-    is_deeply($rect12->check_collision_interval($rect11, 2), [1, 0]);
+$rect11->v_x(1.5);
+is_deeply($rect11->check_collision_interval($rect12, 1), [0, 0]);
+is_deeply($rect12->check_collision_interval($rect11, 1), [0, 0]);
+is_deeply($rect11->check_collision_interval($rect12, 2), [-1, 0]);
+is_deeply($rect12->check_collision_interval($rect11, 2), [1, 0]);
 
-    #  +--+
-    #  |13|
-    #  +--+
-    #
-    # +----+
-    # |14  |
-    # |    |
-    # |    |
-    # +----+
-    my $rect13 = Rect->new( x => 2, y => 0, w => 3, h => 2, v_x => 0, v_y => 0 );
-    my $rect14 = Rect->new( x => 1, y => 4, w => 5, h => 4, v_x => 0, v_y => 0 );
+#  +--+
+#  |13|
+#  +--+
+#
+# +----+
+# |14  |
+# |    |
+# |    |
+# +----+
+my $rect13 = Rect->new( x => 2, y => 0, w => 3, h => 2, v_x => 0, v_y => 0 );
+my $rect14 = Rect->new( x => 1, y => 4, w => 5, h => 4, v_x => 0, v_y => 0 );
 
-    is_deeply($rect13->check_collision_interval($rect14, 1), [0, 0]);
-    is_deeply($rect14->check_collision_interval($rect13, 1), [0, 0]);
+is_deeply($rect13->check_collision_interval($rect14, 1), [0, 0]);
+is_deeply($rect14->check_collision_interval($rect13, 1), [0, 0]);
 
-    $rect13->v_y(3.0);
-    is_deeply($rect13->check_collision_interval($rect14, 1), [0, 1]);
-    is_deeply($rect14->check_collision_interval($rect13, 1), [0, -1]);
+$rect13->v_y(3.0);
+is_deeply($rect13->check_collision_interval($rect14, 1), [0, 1]);
+is_deeply($rect14->check_collision_interval($rect13, 1), [0, -1]);
 
-    $rect13->v_y(1.5);
-    is_deeply($rect13->check_collision_interval($rect14, 1), [0, 0]);
-    is_deeply($rect14->check_collision_interval($rect13, 1), [0, 0]);
-    is_deeply($rect13->check_collision_interval($rect14, 2), [0, 1]);
-    is_deeply($rect14->check_collision_interval($rect13, 2), [0, -1]);
-}
+$rect13->v_y(1.5);
+is_deeply($rect13->check_collision_interval($rect14, 1), [0, 0]);
+is_deeply($rect14->check_collision_interval($rect13, 1), [0, 0]);
+is_deeply($rect13->check_collision_interval($rect14, 2), [0, 1]);
+is_deeply($rect14->check_collision_interval($rect13, 2), [0, -1]);
 
 done_testing;
