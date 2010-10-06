@@ -333,30 +333,22 @@ sub _check_collision_interval_axis_rect {
 
         return $axis if $v_x == 0 && $v_y == 0;
 
-        # Starting points
-        my $x1 = $self->x;
-        my $y1 = $self->y;
+        my ($x1, $y1) = ($self->x,            $self->y);
+        my ($x2, $y2) = ($self->x + $self->w, $self->y + $self->h);
 
-        my @start_corners = (
-            [$x1,            $y1],
-            [$x1 + $self->w, $y1],
-            [$x1 + $self->w, $y1 + $self->h],
-            [$x1,            $y1 + $self->h],
-        );
+        my @self_corners = ([$x1, $y1], [$x2, $y1], [$x2, $y2], [$x1, $y2]);
 
-        my @target_corners = (
-            [$target->x,              $target->y],
-            [$target->x + $target->w, $target->y],
-            [$target->x + $target->w, $target->y + $target->h],
-            [$target->x,              $target->y + $target->h],
-        );
+        ($x1, $y1) = ($target->x,              $target->y);
+        ($x2, $y2) = ($target->x + $target->w, $target->y + $target->h);
+
+        my @target_corners = ([$x1, $y1], [$x2, $y1], [$x2, $y2], [$x1, $y2]);
 
         # x-axis checks
         if ($v_x != 0) {
 
             my @sides = ($v_x <=> 0) == 1
-                ? ([@start_corners[1, 2]], [@target_corners[0, 3]])
-                : ([@start_corners[0, 3]], [@target_corners[1, 2]]);
+                ? ([@self_corners[1, 2]], [@target_corners[0, 3]])
+                : ([@self_corners[0, 3]], [@target_corners[1, 2]]);
 
             $axis->[0] = _check_collision_interval_axis_side(@sides, [$v_x, $v_y]);
         }
@@ -365,8 +357,8 @@ sub _check_collision_interval_axis_rect {
         if ($v_y != 0) {
 
             my @sides = ($v_y <=> 0) == 1
-                ? ([@start_corners[2, 3]], [@target_corners[0, 1]])
-                : ([@start_corners[0, 1]], [@target_corners[3, 2]]);
+                ? ([@self_corners[2, 3]], [@target_corners[0, 1]])
+                : ([@self_corners[0, 1]], [@target_corners[3, 2]]);
 
             @sides = map {
                 my @points = @$_;
