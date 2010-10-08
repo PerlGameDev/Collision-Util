@@ -226,4 +226,28 @@ is_deeply($rect14->check_collision_interval($rect13, 1), [0, 0]);
 is_deeply($rect13->check_collision_interval($rect14, 2), [0, 1]);
 is_deeply($rect14->check_collision_interval($rect13, 2), [0, -1]);
 
+$rect13->v_x(-0.1);
+$rect13->v_y(3.0);
+is_deeply($rect13->check_collision_interval($rect14, 1), [0, 1]);
+is_deeply($rect14->check_collision_interval($rect13, 1), [0, -1]);
+
+# +----+
+# |15  |
+# |    |
+# |    |
+# +----+
+#
+#  +--+
+#  |16|
+#  +--+
+my $rect15 = Rect->new( x => 1, y => 0, w => 5, h => 4, v_x => 0, v_y => 0 );
+my $rect16 = Rect->new( x => 2, y => 4, w => 3, h => 2, v_x => 0, v_y => 0 );
+
+is_deeply($rect15->check_collision_interval($rect16, 1), [0, 0]);
+is_deeply($rect16->check_collision_interval($rect15, 1), [0, 0]);
+
+$rect15->v_y(3.0);
+is_deeply($rect15->check_collision_interval($rect16, 1), [0, 1]);
+is_deeply($rect16->check_collision_interval($rect15, 1), [0, -1]);
+
 done_testing;

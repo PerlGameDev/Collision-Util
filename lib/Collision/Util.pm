@@ -397,7 +397,7 @@ sub _check_collision_interval_axis_rect {
         # y-axis checks
         if ($v_y != 0) {
             my @sides = ($v_y <=> 0) == 1
-                ? ([@self_corners[2, 3]], [@target_corners[0, 1]])
+                ? ([@self_corners[3, 2]], [@target_corners[0, 1]])
                 : ([@self_corners[0, 1]], [@target_corners[3, 2]]);
 
             # Reverse x and y coordinates and velocoties.
