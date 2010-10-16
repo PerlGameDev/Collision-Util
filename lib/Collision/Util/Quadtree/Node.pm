@@ -59,6 +59,9 @@ sub insert {
         if ( defined $parent ) {
             $parent->insert($item);
         }
+        else {
+            warn "Item is outside of tree\n";
+        }
         return;
     }
 
@@ -217,9 +220,14 @@ sub get_collisions {
                             }
                         }
                     }
-                    push @collisions, @{ $child->get_collisions($rect) };
                 }
             }
+        }
+    }
+
+    if ( $_is_partitioned{$id} ) {
+        foreach my $child ( @{ $_children{$id} } ) {
+            push @collisions, @{ $child->get_collisions($rect) };
         }
     }
 
