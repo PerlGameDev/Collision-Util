@@ -4,10 +4,18 @@ use warnings;
 
 use SDL;
 use SDL::Event;
+use SDL::Events;
 use SDLx::App;
 use Collision::Util::Rect;
 use Collision::Util::Quadtree;
 use Scalar::Util 'refaddr';
+
+print <<'EOT';
+Press 'q' or 'b' to change the collision detection algorithm used to
+Quadtree or brute force.
+
+To exit the demo, close the window or press the escape key.
+EOT
 
 my $algorithm = 'quadtree';
 my ( $width, $height ) = ( 640, 480 );
@@ -23,7 +31,7 @@ my $quadtree = Collision::Util::Quadtree->new(
     max_depth => 4,
 );
 
-foreach ( 1 .. 100 ) {
+foreach ( 1 .. 150 ) {
     my $rect = Collision::Util::Rect->new(
         x   => rand() * $width,
         y   => rand() * $height,
