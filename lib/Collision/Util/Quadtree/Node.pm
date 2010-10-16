@@ -104,10 +104,12 @@ sub partition {
         h         => $h,
     );
 
-    $_children{$id}->[0] = __PACKAGE__->new( %options, x => $x1, y => $y1 );
-    $_children{$id}->[1] = __PACKAGE__->new( %options, x => $x2, y => $y1 );
-    $_children{$id}->[2] = __PACKAGE__->new( %options, x => $x1, y => $y2 );
-    $_children{$id}->[3] = __PACKAGE__->new( %options, x => $x2, y => $y2 );
+    $_children{$id} = [
+        __PACKAGE__->new( %options, x => $x1, y => $y1 ),
+        __PACKAGE__->new( %options, x => $x2, y => $y1 ),
+        __PACKAGE__->new( %options, x => $x1, y => $y2 ),
+        __PACKAGE__->new( %options, x => $x2, y => $y2 ),
+    ];
 
     $_is_partitioned{$id} = 1;
 
@@ -148,7 +150,7 @@ sub move {
 
     my $id = refaddr $self;
 
-    if (!$self->_push_down($item)) {
+    if ( !$self->_push_down($item) ) {
         if ( defined $_parent{$id} ) {
             $self->_push_up($item);
         }
