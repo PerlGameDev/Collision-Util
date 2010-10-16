@@ -91,8 +91,8 @@ sub partition {
     return if $_depth{$id} == $_max_depth{$id};
 
     my ( $w, $h ) = ( $self->w / 2, $self->h / 2 );
-    my ( $x1, $y1, $x2, $y2 )
-        = ( $self->x, $self->y, $self->x + $w, $self->y + $h );
+    my ( $x1, $y1 ) = ( $self->x, $self->y );
+    my ( $x2, $y2 ) = ( $x1 + $w, $y1 + $h );
 
     my %options = (
         tree      => $_tree{$id},
@@ -201,10 +201,12 @@ sub get_collisions {
             }
             if ( $_is_partitioned{$id} ) {
                 foreach my $child ( @{ $_children{$id} } ) {
-                    foreach my $other ( @{ $child->get_items($rect) } ) {
-                        if ( $item->intersects($other) ) {
-                            push @collisions, $item;
-                            push @collisions, $other;
+                    if ($item->intersects($child)) {
+                        foreach my $other ( @{ $child->get_items($rect) } ) {
+                            if ( $item->intersects($other) ) {
+                                push @collisions, $item;
+                                push @collisions, $other;
+                            }
                         }
                     }
                     push @collisions, @{ $child->get_collisions($rect) };
