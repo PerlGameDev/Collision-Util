@@ -187,8 +187,6 @@ sub get_collisions {
 
     my $id = refaddr $self;
 
-    #warn 'depth: ', $_depth{$id}, ' items: ', scalar @{ $_items{$id} };
-
     my @collisions;
 
     my $max = @{ $_items{$id} } - 1;
