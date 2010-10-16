@@ -59,7 +59,7 @@ sub insert {
         push @{ $_items{$id} }, $item;
         $_tree{$id}->register_item( $item, $self );
 
-        if ( !$_is_partitioned{$id} && @{ $_items{$id} } < $_max_items{$id} )
+        if ( !$_is_partitioned{$id} && @{ $_items{$id} } > $_max_items{$id} )
         {
             $self->partition();
         }
