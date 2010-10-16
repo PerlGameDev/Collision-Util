@@ -136,16 +136,11 @@ sub _push_up {
     my ( $self, $item ) = @_;
 
     my $id = refaddr $self;
+
     @{ $_items{$id} }
         = grep { refaddr $_ ne refaddr $item } @{ $_items{$id} };
 
-    my $parent = $_parent{$id};
-    if ( defined $parent ) {
-        $parent->insert($item);
-    }
-    else {
-        $self->insert($item);
-    }
+    $_parent{$id}->insert($item);
 }
 
 sub move {
@@ -154,7 +149,9 @@ sub move {
     my $id = refaddr $self;
 
     if (!$self->_push_down($item)) {
-        $self->_push_up($item);
+        if ( defined $_parent{$id} ) {
+            $self->_push_up($item);
+        }
     }
 }
 
