@@ -3,7 +3,7 @@ package Collision::Util::Rect;
 use strict;
 use warnings;
 
-use Collision::Util ':std';
+use Collision::Util qw(check_contains_rect check_collision_rect);
 use Scalar::Util 'refaddr';
 
 my %_x;
@@ -109,12 +109,12 @@ sub right {
 
 sub intersects {
     my ( $self, $rect ) = @_;
-    return $self->check_collision($rect);
+    return $self->check_collision_rect($rect);
 }
 
 sub contains {
     my ( $self, $rect ) = @_;
-    return $self->check_contains($rect);
+    return $self->check_contains_rect($rect);
 }
 
 1;
