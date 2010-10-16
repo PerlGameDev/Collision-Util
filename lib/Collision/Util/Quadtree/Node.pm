@@ -54,6 +54,14 @@ sub insert {
 
     my $id = refaddr $self;
 
+    if ( !$self->contains($item) ) {
+        my $parent = $_parent{$id};
+        if ( defined $parent ) {
+            $parent->insert($item);
+        }
+        return;
+    }
+
     if ( !$self->_insert_in_child($item) ) {
 
         push @{ $_items{$id} }, $item;
@@ -201,7 +209,7 @@ sub get_collisions {
             }
             if ( $_is_partitioned{$id} ) {
                 foreach my $child ( @{ $_children{$id} } ) {
-                    if ($item->intersects($child)) {
+                    if ( $item->intersects($child) ) {
                         foreach my $other ( @{ $child->get_items($rect) } ) {
                             if ( $item->intersects($other) ) {
                                 push @collisions, $item;
