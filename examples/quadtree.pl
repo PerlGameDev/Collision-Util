@@ -9,17 +9,18 @@ use Collision::Util::Rect;
 use Collision::Util::Quadtree;
 use Scalar::Util 'refaddr';
 
+my $algorithm = 'quadtree';
 my ( $width, $height ) = ( 640, 480 );
-my @collisions;
+
 my @rects;
 
 my $quadtree = Collision::Util::Quadtree->new(
-    x         => 0,
-    y         => 0,
-    w         => $width,
-    h         => $height,
-    max_items => 3,
-    max_depth => 2,
+    x         => 0 - 20,
+    y         => 0 - 20,
+    w         => $width + 40,
+    h         => $height + 40,
+    max_items => 2,
+    max_depth => 4,
 );
 
 foreach ( 1 .. 100 ) {
@@ -39,14 +40,42 @@ my $app = SDLx::App->new(
     title  => 'Collision::Util::Quadtree Example',
     width  => $width,
     height => $height,
-    dt     => 1,
 );
+
+sub get_collisions {
+    if ( $algorithm eq 'quadtree' ) {
+        $quadtree->move($_) foreach @rects;
+        return $quadtree->get_collisions();
+    }
+    elsif ( $algorithm eq 'bruteforce' ) {
+        my @collisions;
+        my $max = @rects - 1;
+        foreach my $rect_id ( 0 .. $max ) {
+            my $rect = $rects[$rect_id];
+            foreach my $other_id ( $rect_id + 1 .. $max ) {
+                my $other = $rects[$other_id];
+                if ( $rect->intersects($other) ) {
+                    push @collisions, $rect;
+                    push @collisions, $other;
+                }
+            }
+        }
+        return \@collisions;
+    }
+}
 
 $app->add_event_handler(
     sub {
         my ($event) = @_;
         $app->stop if $event->type == SDL_QUIT;
         $app->stop if $event->key_sym == SDLK_ESCAPE;
+
+        if ( $event->type == SDL_KEYDOWN ) {
+            my $key = SDL::Events::get_key_name( $event->key_sym );
+            $algorithm = 'quadtree'   if $key eq 'q';
+            $algorithm = 'bruteforce' if $key eq 'b';
+            print $algorithm, "\n" if $key eq 'q' || $key eq 'b';
+        }
     }
 );
 
@@ -67,20 +96,21 @@ $app->add_move_handler(
                 $rect->y( -$rect->h );
             }
             elsif ( $rect->y < -$rect->h ) {
-                $rect->x($height);
+                $rect->y($height);
             }
-            $quadtree->move($rect);
         }
-        @collisions = @{ $quadtree->get_collisions() };
     }
 );
 
 $app->add_show_handler(
     sub {
         $app->draw_rect;
+        my @collisions = @{ get_collisions() };
+        my %collisions;
+        $collisions{ refaddr $_} = 1 foreach @collisions;
         foreach my $rect (@rects) {
             my $color
-                = ( grep { refaddr $rect eq refaddr $_ } @collisions )
+                = defined $collisions{ refaddr $rect}
                 ? 0xFF0000FF
                 : 0x888888FF;
             $app->draw_rect( [ $rect->x, $rect->y, $rect->w, $rect->h ],
