@@ -10,20 +10,29 @@ use Collision::Util::Quadtree;
 use Scalar::Util 'refaddr';
 
 my ( $width, $height ) = ( 640, 480 );
-my $quadtree;
 my @collisions;
 my @rects;
 
+my $quadtree = Collision::Util::Quadtree->new(
+    x         => 0,
+    y         => 0,
+    w         => $width,
+    h         => $height,
+    max_items => 3,
+    max_depth => 2,
+);
+
 foreach ( 1 .. 100 ) {
-    push @rects,
-        Collision::Util::Rect->new(
+    my $rect = Collision::Util::Rect->new(
         x   => rand() * $width,
         y   => rand() * $height,
         w   => rand() * 10 + 2,
         h   => rand() * 10 + 2,
         v_x => rand() * 10 - 5,
         v_y => rand() * 10 - 5,
-        );
+    );
+    push @rects, $rect;
+    $quadtree->insert($rect);
 }
 
 my $app = SDLx::App->new(
@@ -44,13 +53,6 @@ $app->add_event_handler(
 $app->add_move_handler(
     sub {
         my ($step) = @_;
-        $quadtree = Collision::Util::Quadtree->new(
-            x         => 0,
-            y         => 0,
-            w         => $width,
-            h         => $height,
-            max_items => 3,
-        );
         foreach my $rect (@rects) {
             $rect->x( $rect->x + $rect->v_x * $step );
             $rect->y( $rect->y + $rect->v_y * $step );
@@ -67,7 +69,7 @@ $app->add_move_handler(
             elsif ( $rect->y < -$rect->h ) {
                 $rect->x($height);
             }
-            $quadtree->insert($rect);
+            $quadtree->move($rect);
         }
         @collisions = @{ $quadtree->get_collisions() };
     }
