@@ -6,8 +6,7 @@ use warnings;
 use Scalar::Util 'refaddr';
 use Collision::Util::Rect;
 
-use base 'Collision::Util::Rect';
-
+my %_rect;
 my %_tree;
 my %_depth;
 my %_parent;
@@ -20,9 +19,10 @@ my %_max_depth;
 sub new {
     my ( $class, %options ) = @_;
 
-    my $self = bless $class->SUPER::new(%options), $class;
+    my $self = bless do { \my $anon_scalar }, $class;
 
     my $id = refaddr $self;
+    $_rect{$id}           = Collision::Util::Rect->new(%options);
     $_tree{$id}           = $options{tree};
     $_depth{$id}          = $options{depth};
     $_parent{$id}         = $options{parent};
@@ -39,6 +39,7 @@ sub DESTROY {
     my ($self) = @_;
 
     my $id = refaddr $self;
+    delete $_rect{$id};
     delete $_tree{$id};
     delete $_depth{$id};
     delete $_parent{$id};
@@ -49,12 +50,16 @@ sub DESTROY {
     delete $_max_depth{$id};
 }
 
+sub rect {
+    return $_rect{refaddr $_[0]};
+}
+
 sub insert {
     my ( $self, $item ) = @_;
 
     my $id = refaddr $self;
 
-    if ( !$self->contains($item) ) {
+    if ( !$_rect{$id}->contains($item) ) {
         my $parent = $_parent{$id};
         if ( defined $parent ) {
             $parent->insert($item);
@@ -85,7 +90,7 @@ sub _insert_in_child {
     return 0 if !$_is_partitioned{$id};
 
     foreach my $child ( @{ $_children{$id} } ) {
-        if ( $child->contains($item) ) {
+        if ( $child->rect->contains($item) ) {
             $child->insert($item);
             return 1;
         }
@@ -101,8 +106,9 @@ sub partition {
 
     return if $_depth{$id} == $_max_depth{$id};
 
-    my ( $w, $h ) = ( $self->w / 2, $self->h / 2 );
-    my ( $x1, $y1 ) = ( $self->x, $self->y );
+    my $rect = $_rect{$id};
+    my ( $w, $h ) = ( $rect->w / 2, $rect->h / 2 );
+    my ( $x1, $y1 ) = ( $rect->x, $rect->y );
     my ( $x2, $y2 ) = ( $x1 + $w, $y1 + $h );
 
     my %options = (
@@ -171,11 +177,11 @@ sub move {
 sub get_items {
     my ( $self, $rect ) = @_;
 
-    if ( $self->intersects($rect) ) {
-        my $id    = refaddr $self;
+    my $id = refaddr $self;
+    if ( $_rect{$id}->intersects($rect) ) {
         my @items = @{ $_items{$id} };
 
-        if ( !$rect->contains($self) ) {
+        if ( !$rect->contains($_rect{$id}) ) {
             @items = grep { $rect->intersects($_) } @items;
         }
 
@@ -212,7 +218,7 @@ sub get_collisions {
             }
             if ( $_is_partitioned{$id} ) {
                 foreach my $child ( @{ $_children{$id} } ) {
-                    if ( $item->intersects($child) ) {
+                    if ( $item->intersects($child->rect) ) {
                         foreach my $other ( @{ $child->get_items($rect) } ) {
                             if ( $item->intersects($other) ) {
                                 push @collisions, $item;

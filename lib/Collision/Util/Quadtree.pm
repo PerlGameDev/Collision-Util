@@ -47,7 +47,7 @@ sub register_item {
 sub get_collisions {
     my ( $self, $rect ) = @_;
 
-    $rect ||= $self->{root};
+    $rect ||= $self->{root}->rect;
 
     return $self->{root}->get_collisions($rect);
 }
