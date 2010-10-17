@@ -83,30 +83,6 @@ sub v_y {
     return $_v_y{$id};
 }
 
-sub top {
-    my ($self) = @_;
-    my $id = refaddr $self;
-    return $_y{$id};
-}
-
-sub bottom {
-    my ($self) = @_;
-    my $id = refaddr $self;
-    return $_y{$id} + $_h{$id};
-}
-
-sub left {
-    my ($self) = @_;
-    my $id = refaddr $self;
-    return $_x{$id};
-}
-
-sub right {
-    my ($self) = @_;
-    my $id = refaddr $self;
-    return $_x{$id} + $_w{$id};
-}
-
 sub intersects {
     my ( $self, $rect ) = @_;
     return $self->check_collision_rect($rect);
