@@ -11,10 +11,12 @@ use Collision::Util::Quadtree;
 use Scalar::Util 'refaddr';
 
 print <<'EOT';
+
 Press 'q' or 'b' to change the collision detection algorithm used to
 Quadtree or brute force.
 
 To exit the demo, close the window or press the escape key.
+
 EOT
 
 my $algorithm = 'quadtree';
