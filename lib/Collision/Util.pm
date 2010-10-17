@@ -10,12 +10,14 @@ BEGIN {
             check_contains check_contains_rect 
             check_collision check_collision_rect
             check_collision_interval check_collision_axis
+            check_collision_dynamic
     );
     our %EXPORT_TAGS = (
         all => \@EXPORT_OK,
         std => [qw( check_contains check_collision )],
         axis => [qw( check_collision_axis )],
         interval => [qw( check_collision_interval )], 
+        dynamic => [qw( check_collision_dynamic )],
     );
 }
 
@@ -160,7 +162,7 @@ sub _check_collision_interval {
         $x2 = $target->x;
         $y2 = $target->y;
         for (1..$interval) {
-            $axis = _check_collision_interval_axis_rect($self, $target);
+            $axis = check_collision_axis_rect($self, $target);
             if ($axis->[0] != 0 or $axis->[1] != 0) {
                 last;
             } else {
@@ -287,8 +289,78 @@ sub check_collision_axis_rect {
     return $axis;
 }
 
+sub check_collision_dynamic {
+    my ($self, $target, $interval) = @_;
 
-# _check_collision_interval_axis_side( [ [$x1, $x2], ... ],
+    Carp::croak "must receive a target"
+        unless $target;
+    Carp::croak "must receive interval"
+        unless $interval;
+
+    my @ret = ();
+    my $ref = ref $target;
+    if ($ref eq 'ARRAY') {
+        my $id = 0;
+        foreach (@$target) {
+            my $axis = _check_collision_dynamic($self, $_, $interval);
+            if ($axis->[0] != 0 || $axis->[1] != 0) {
+                push(@ret, [$id, $axis]);
+                last unless wantarray;
+            }
+            $id++;
+        }
+    } elsif ($ref eq 'HASH') {
+        foreach (keys(%$target)) {
+            my $axis = _check_collision_dynamic($self, $target->{$_}, $interval);
+            if ($axis->[0] != 0 || $axis->[1] != 0) {
+                push(@ret, [$_, $axis]);
+                last unless wantarray;
+            }
+        }
+    } else {
+        return _check_collision_dynamic($self, $target, $interval);
+    }
+    if ($#ret < 0) {
+        push(@ret, [-1, [0, 0]]);
+    }
+    return wantarray ? @ret : $ret[0];
+}
+
+sub _check_collision_dynamic {
+    my ($self, $target, $interval) = @_;
+
+    Carp::croak "must receive a target"
+        unless $target;
+    Carp::croak "must receive interval"
+        unless $interval;
+
+    my $axis = [0, 0];
+    eval {
+        # store original velocity
+        my ($v_x1, $v_y1, $v_x2, $v_y2);
+        $v_x1 = $self->v_x;
+        $v_y1 = $self->v_y;
+        $v_x2 = $target->v_x;
+        $v_y2 = $target->v_y;
+
+        $self->v_x($self->v_x * $interval);
+        $self->v_y($self->v_y * $interval);
+        $target->v_x($target->v_x * $interval);
+        $target->v_y($target->v_y * $interval);
+
+        $axis = _check_collision_dynamic_axis_rect($self, $target);
+
+        # restore
+        $self->v_x($v_x1);
+        $self->v_y($v_y1);
+        $target->v_x($v_x2);
+        $target->v_y($v_y2);
+    };
+    Carp::croak "elements should have x, y, w, h, v_x and v_y accessors: $@" if $@;
+    return $axis;
+}
+
+# _check_collision_dynamic_axis_side( [ [$x1, $x2], ... ],
 #   [ [$s_x1, $s_y1], [$s_x2, $s_y2]], [$v_x, $v_y] );
 #
 # Check if any of a set of points moving with the same velocity collide
@@ -304,7 +376,7 @@ sub check_collision_axis_rect {
 #   -1 if any point collides with the left side of the line.
 #
 # TODO: Think of a better name for this function
-sub _check_collision_interval_axis_side {
+sub _check_collision_dynamic_axis_side {
     my ($points, $side, $v) = @_;
 
     my ($s_x1, $s_y1) = @{ $side->[0] };
@@ -342,7 +414,7 @@ sub _check_collision_interval_axis_side {
 # collision collides with the larger side involved in the collision.
 # Therefore, only these corners are checked for a collision with
 # whichever side it is possible for them to collide with.
-sub _check_collision_interval_axis_rect {
+sub _check_collision_dynamic_axis_rect {
     my ($self, $target) = @_;
 
     Carp::croak "must receive a target"
@@ -391,7 +463,7 @@ sub _check_collision_interval_axis_rect {
                 @v     = map { -$_ } @v;
             }
 
-            $axis->[0] = _check_collision_interval_axis_side(@sides, \@v) * $d;
+            $axis->[0] = _check_collision_dynamic_axis_side(@sides, \@v) * $d;
         }
 
         # y-axis checks
@@ -417,7 +489,7 @@ sub _check_collision_interval_axis_rect {
                 @v     = map { -$_ } @v;
             }
 
-            $axis->[1] = -_check_collision_interval_axis_side(@sides, \@v) * $d;
+            $axis->[1] = -_check_collision_dynamic_axis_side(@sides, \@v) * $d;
         }
     };
     Carp::croak "elements should have x, y, w, h, v_x and v_y accessors: $@" if $@;
