@@ -51,6 +51,14 @@ is_deeply( $rect1->check_collision_interval( $rect2, 4 ), [ 0, 0 ] );
 is_deeply( $rect2->check_collision_interval( $rect1, 4 ), [ 0, 0 ] );
 
 $rect1->v_y(0.0);
+$rect1->v_x(2.0);
+is_deeply( $rect1->check_collision_interval( $rect2, 1 ), [ 0, 0 ] );
+is_deeply( $rect2->check_collision_interval( $rect1, 1 ), [ 0, 0 ] );
+
+$rect1->v_x(2.1);
+is_deeply( $rect1->check_collision_interval( $rect2, 1 ), [ -1, 0 ] );
+is_deeply( $rect2->check_collision_interval( $rect1, 1 ), [ 1,  0 ] );
+
 $rect1->v_x(3.0);
 is_deeply( $rect1->check_collision_interval( $rect2, 2 ), [ -1, 0 ] );
 is_deeply( $rect2->check_collision_interval( $rect1, 2 ), [ 1,  0 ] );
@@ -61,18 +69,15 @@ is_deeply( $rect2->check_collision_interval( $rect1, 1 ), [ 0,  0 ] );
 is_deeply( $rect1->check_collision_interval( $rect2, 2 ), [ -1, 0 ] );
 is_deeply( $rect2->check_collision_interval( $rect1, 2 ), [ 1,  0 ] );
 
-TODO: {
-    local $TODO = 'diagonal movement';
-    $rect1->v_x(3.0);
-    $rect1->v_y(0.1);
-    is_deeply( $rect1->check_collision_interval( $rect2, 1 ), [ -1, 0 ] );
-    is_deeply( $rect2->check_collision_interval( $rect1, 1 ), [ 1,  0 ] );
+$rect1->v_x(3.0);
+$rect1->v_y(0.1);
+is_deeply( $rect1->check_collision_interval( $rect2, 1 ), [ -1, 0 ] );
+is_deeply( $rect2->check_collision_interval( $rect1, 1 ), [ 1,  0 ] );
 
-    $rect1->v_x(3.0);
-    $rect1->v_y(-0.1);
-    is_deeply( $rect1->check_collision_interval( $rect2, 1 ), [ -1, 0 ] );
-    is_deeply( $rect2->check_collision_interval( $rect1, 1 ), [ 1,  0 ] );
-}
+$rect1->v_x(3.0);
+$rect1->v_y(-0.1);
+is_deeply( $rect1->check_collision_interval( $rect2, 1 ), [ -1, 0 ] );
+is_deeply( $rect2->check_collision_interval( $rect1, 1 ), [ 1,  0 ] );
 
 # +-+
 # |3|
@@ -94,6 +99,14 @@ is_deeply( $rect3->check_collision_interval( $rect4, 4 ), [ 0, 0 ] );
 is_deeply( $rect4->check_collision_interval( $rect3, 4 ), [ 0, 0 ] );
 
 $rect3->v_x(0.0);
+$rect3->v_y(2.0);
+is_deeply( $rect3->check_collision_interval( $rect4, 1 ), [ 0, 0 ] );
+is_deeply( $rect4->check_collision_interval( $rect3, 1 ), [ 0, 0 ] );
+
+$rect3->v_y(2.1);
+is_deeply( $rect3->check_collision_interval( $rect4, 1 ), [ 0, 1 ] );
+is_deeply( $rect4->check_collision_interval( $rect3, 1 ), [ 0, -1 ] );
+
 $rect3->v_y(3.0);
 is_deeply( $rect3->check_collision_interval( $rect4, 1 ), [ 0, 1 ] );
 is_deeply( $rect4->check_collision_interval( $rect3, 1 ), [ 0, -1 ] );
@@ -104,18 +117,15 @@ is_deeply( $rect4->check_collision_interval( $rect3, 1 ), [ 0, 0 ] );
 is_deeply( $rect3->check_collision_interval( $rect4, 2 ), [ 0, 1 ] );
 is_deeply( $rect4->check_collision_interval( $rect3, 2 ), [ 0, -1 ] );
 
-TODO: {
-    local $TODO = 'diagonal movement';
-    $rect3->v_x(0.1);
-    $rect3->v_y(3.0);
-    is_deeply( $rect3->check_collision_interval( $rect4, 1 ), [ 0, 1 ] );
-    is_deeply( $rect4->check_collision_interval( $rect3, 1 ), [ 0, -1 ] );
+$rect3->v_x(0.1);
+$rect3->v_y(3.0);
+is_deeply( $rect3->check_collision_interval( $rect4, 1 ), [ 0, 1 ] );
+is_deeply( $rect4->check_collision_interval( $rect3, 1 ), [ 0, -1 ] );
 
-    $rect3->v_x(-0.1);
-    $rect3->v_y(3.0);
-    is_deeply( $rect3->check_collision_interval( $rect4, 1 ), [ 0, 1 ] );
-    is_deeply( $rect4->check_collision_interval( $rect3, 1 ), [ 0, -1 ] );
-}
+$rect3->v_x(-0.1);
+$rect3->v_y(3.0);
+is_deeply( $rect3->check_collision_interval( $rect4, 1 ), [ 0, 1 ] );
+is_deeply( $rect4->check_collision_interval( $rect3, 1 ), [ 0, -1 ] );
 
 # +-+
 # |5|
@@ -130,20 +140,17 @@ my $rect6 = Rect->new( x => 5, y => 4, w => 2, h => 2, v_x => 0, v_y => 0 );
 is_deeply( $rect5->check_collision_interval( $rect6, 1 ), [ 0, 0 ] );
 is_deeply( $rect6->check_collision_interval( $rect5, 1 ), [ 0, 0 ] );
 
-TODO: {
-    local $TODO = 'diagonal movement';
-    $rect5->v_x(3.0);
-    $rect5->v_y(3.0);
-    is_deeply( $rect5->check_collision_interval( $rect6, 1 ), [ -1, 1 ] );
-    is_deeply( $rect6->check_collision_interval( $rect5, 1 ), [ 1,  -1 ] );
+$rect5->v_x(3.0);
+$rect5->v_y(3.0);
+is_deeply( $rect5->check_collision_interval( $rect6, 1 ), [ -1, 1 ] );
+is_deeply( $rect6->check_collision_interval( $rect5, 1 ), [ 1,  -1 ] );
 
-    $rect5->v_x(1.5);
-    $rect5->v_y(1.5);
-    is_deeply( $rect5->check_collision_interval( $rect6, 1 ), [ 0,  0 ] );
-    is_deeply( $rect6->check_collision_interval( $rect5, 1 ), [ 0,  0 ] );
-    is_deeply( $rect5->check_collision_interval( $rect6, 2 ), [ -1, 1 ] );
-    is_deeply( $rect6->check_collision_interval( $rect5, 2 ), [ 1,  -1 ] );
-}
+$rect5->v_x(1.5);
+$rect5->v_y(1.5);
+is_deeply( $rect5->check_collision_interval( $rect6, 1 ), [ 0,  0 ] );
+is_deeply( $rect6->check_collision_interval( $rect5, 1 ), [ 0,  0 ] );
+is_deeply( $rect5->check_collision_interval( $rect6, 2 ), [ -1, 1 ] );
+is_deeply( $rect6->check_collision_interval( $rect5, 2 ), [ 1,  -1 ] );
 
 # +-+
 # |7| +-+
@@ -234,13 +241,15 @@ is_deeply( $rect14->check_collision_interval( $rect13, 1 ), [ 0, 0 ] );
 is_deeply( $rect13->check_collision_interval( $rect14, 2 ), [ 0, 1 ] );
 is_deeply( $rect14->check_collision_interval( $rect13, 2 ), [ 0, -1 ] );
 
+$rect13->v_x(-0.1);
+$rect13->v_y(3.0);
+
 TODO: {
     local $TODO = 'diagonal movement';
-    $rect13->v_x(-0.1);
-    $rect13->v_y(3.0);
     is_deeply( $rect13->check_collision_interval( $rect14, 1 ), [ 0, 1 ] );
-    is_deeply( $rect14->check_collision_interval( $rect13, 1 ), [ 0, -1 ] );
 }
+
+is_deeply( $rect14->check_collision_interval( $rect13, 1 ), [ 0, -1 ] );
 
 # +----+
 # |15  |

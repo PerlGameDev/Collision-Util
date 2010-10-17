@@ -51,7 +51,17 @@ is_deeply( $rect1->check_collision_dynamic( $rect2, 4 ), [ 0, 0 ] );
 is_deeply( $rect2->check_collision_dynamic( $rect1, 4 ), [ 0, 0 ] );
 
 $rect1->v_y(0.0);
+$rect1->v_x(2.0);
+is_deeply( $rect1->check_collision_dynamic( $rect2, 1 ), [ 0, 0 ] );
+is_deeply( $rect2->check_collision_dynamic( $rect1, 1 ), [ 0, 0 ] );
+
+$rect1->v_x(2.1);
+is_deeply( $rect1->check_collision_dynamic( $rect2, 1 ), [ -1, 0 ] );
+is_deeply( $rect2->check_collision_dynamic( $rect1, 1 ), [ 1,  0 ] );
+
 $rect1->v_x(3.0);
+is_deeply( $rect1->check_collision_dynamic( $rect2, 1 ), [ -1, 0 ] );
+is_deeply( $rect2->check_collision_dynamic( $rect1, 1 ), [ 1,  0 ] );
 is_deeply( $rect1->check_collision_dynamic( $rect2, 2 ), [ -1, 0 ] );
 is_deeply( $rect2->check_collision_dynamic( $rect1, 2 ), [ 1,  0 ] );
 
@@ -91,6 +101,14 @@ is_deeply( $rect3->check_collision_dynamic( $rect4, 4 ), [ 0, 0 ] );
 is_deeply( $rect4->check_collision_dynamic( $rect3, 4 ), [ 0, 0 ] );
 
 $rect3->v_x(0.0);
+$rect3->v_y(2.0);
+is_deeply( $rect3->check_collision_dynamic( $rect4, 1 ), [ 0, 0 ] );
+is_deeply( $rect4->check_collision_dynamic( $rect3, 1 ), [ 0, 0 ] );
+
+$rect3->v_y(2.1);
+is_deeply( $rect3->check_collision_dynamic( $rect4, 1 ), [ 0, 1 ] );
+is_deeply( $rect4->check_collision_dynamic( $rect3, 1 ), [ 0, -1 ] );
+
 $rect3->v_y(3.0);
 is_deeply( $rect3->check_collision_dynamic( $rect4, 1 ), [ 0, 1 ] );
 is_deeply( $rect4->check_collision_dynamic( $rect3, 1 ), [ 0, -1 ] );
