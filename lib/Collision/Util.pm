@@ -360,10 +360,10 @@ sub _check_collision_dynamic {
     return $axis;
 }
 
-# This implementation relies on the fact if two rectangles with the same
-# orientation collide (in this case the sides are parallel to the x-axis
-# and y-axis) one or both corners of the smaller side involved in the
-# collision collides with the larger side involved in the collision.
+# This implementation relies on the fact that if two rectangles with the
+# same orientation collide (in this case the sides are parallel to the
+# x-axis and y-axis) one or both corners of the smaller side involved in
+# the collision collides with the larger side involved in the collision.
 # Therefore, only these corners are checked for a collision with
 # whichever side it is possible for them to collide with.
 sub _check_collision_dynamic_axis_rect {
