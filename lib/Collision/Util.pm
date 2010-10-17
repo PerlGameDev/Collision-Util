@@ -162,15 +162,15 @@ sub _check_collision_interval {
         $x2 = $target->x;
         $y2 = $target->y;
         for (1..$interval) {
+            # move to next position
+            $self->x($self->x + $self->v_x);
+            $self->y($self->y + $self->v_y);
+            $target->x($target->x + $target->v_x);
+            $target->y($target->y + $target->v_y);
             $axis = check_collision_axis_rect($self, $target);
             if ($axis->[0] != 0 or $axis->[1] != 0) {
                 last;
             } else {
-                # move to next position
-                $self->x($self->x + $self->v_x);
-                $self->y($self->y + $self->v_y);
-                $target->x($target->x + $target->v_x);
-                $target->y($target->y + $target->v_y);
                 # do this debugging for now. TODO: remove later :)
                 my $c = check_collision_rect($self, $target);
                 if ($c) {
