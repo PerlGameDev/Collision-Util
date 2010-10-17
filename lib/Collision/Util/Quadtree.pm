@@ -23,7 +23,7 @@ sub new {
     $self->{node_for_item} = {};
 
     foreach my $item ( @{ $options{items} } ) {
-        $self->insert_item($item);
+        $self->insert($item);
     }
 
     return $self;
