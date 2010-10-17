@@ -237,48 +237,48 @@ sub check_collision_axis_rect {
     my $axis = [0, 0];
     eval {
         # x-axis left
-        # x    <= x2+w2 <= x+w
-        # y    <  y2+h2
-        # y2   <  y+h
-        # v_x2 < v_x
-        if (($self->x + $self->w >= $target->x) &&
-            ($self->x + $self->w <= $target->x + $target->w) &&
-            ($self->y + $self->h >=  $target->y) &&
+        # x    <  x2+w2 < x+w
+        # y    <= y2+h2
+        # y2   <= y+h
+        # v_x2 <  v_x
+        if (($self->x + $self->w > $target->x) &&
+            ($self->x + $self->w < $target->x + $target->w) &&
+            ($self->y + $self->h >= $target->y) &&
             ($self->y <= $target->y + $target->h) &&
             ($self->v_x > $target->v_x)) {
             $axis->[0] = -1;
         }
         # x-axis right
-        # x   <= x2 <= x+w
-        # y   <  y2+h2
-        # y2  <  y+h
+        # x   < x2 < x+w
+        # y   <= y2+h2
+        # y2  <= y+h
         # v_x <  v_x2
-        elsif (($self->x >= $target->x) &&
-            ($self->x <= $target->x + $target->w) &&
-            ($self->y + $self->h >=  $target->y) &&
-            ($self->y <=  $target->y + $target->h) &&
+        elsif (($self->x > $target->x) &&
+            ($self->x < $target->x + $target->w) &&
+            ($self->y + $self->h >= $target->y) &&
+            ($self->y <= $target->y + $target->h) &&
             ($self->v_x < $target->v_x)) {
             $axis->[0] = 1;
         }
         # y-axis top
-        # y    <= y2+h2 <= y+h
-        # x    <  x2+w2
-        # x2   <  x+w
-        # v_y2 < v_y
-        if (($self->y + $self->h >= $target->y) &&
-            ($self->y + $self->h <= $target->y + $target->h) &&
+        # y    <  y2+h2 < y+h
+        # x    <= x2+w2
+        # x2   <= x+w
+        # v_y2 <  v_y
+        if (($self->y + $self->h > $target->y) &&
+            ($self->y + $self->h < $target->y + $target->h) &&
             ($self->x + $self->w >=  $target->x) &&
             ($self->x <= $target->x + $target->w) &&
             ($self->v_y > $target->v_y)) {
             $axis->[1] = 1;
         }
         # y-axis bottom
-        # y+h <= y2 <= y
-        # x   <  x2+w2
-        # x2  <  x+w
-        # v_y < v_y2
-        elsif (($self->y >= $target->y) &&
-            ($self->y <= $target->y + $target->h) &&
+        # y+h <  y2 < y
+        # x   <= x2+w2
+        # x2  <= x+w
+        # v_y <  v_y2
+        elsif (($self->y > $target->y) &&
+            ($self->y < $target->y + $target->h) &&
             ($self->x + $self->w >= $target->x) &&
             ($self->x <= $target->x + $target->w) &&
             ($self->v_y < $target->v_y)) {
