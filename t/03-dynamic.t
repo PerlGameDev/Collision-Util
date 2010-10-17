@@ -164,7 +164,16 @@ my $rect8 = Rect->new( x => 5, y => 1, w => 2, h => 2, v_x => 0, v_y => 0 );
 is_deeply( $rect7->check_collision_dynamic( $rect8, 1 ), [ 0, 0 ] );
 is_deeply( $rect8->check_collision_dynamic( $rect7, 1 ), [ 0, 0 ] );
 
+$rect7->v_x(2.0);
+is_deeply( $rect7->check_collision_dynamic( $rect8, 1 ), [ 0, 0 ] );
+is_deeply( $rect8->check_collision_dynamic( $rect7, 1 ), [ 0, 0 ] );
+
+$rect7->v_y(0.1);
+is_deeply( $rect7->check_collision_dynamic( $rect8, 1 ), [ 0, 0 ] );
+is_deeply( $rect8->check_collision_dynamic( $rect7, 1 ), [ 0, 0 ] );
+
 $rect7->v_x(3.0);
+$rect7->v_y(0.0);
 is_deeply( $rect7->check_collision_dynamic( $rect8, 1 ), [ -1, 0 ] );
 is_deeply( $rect8->check_collision_dynamic( $rect7, 1 ), [ 1,  0 ] );
 
