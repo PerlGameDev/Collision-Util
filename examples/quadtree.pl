@@ -24,15 +24,6 @@ my ( $width, $height ) = ( 640, 480 );
 
 my @rects;
 
-my $quadtree = Collision::Util::Quadtree->new(
-    x         => 0 - 20,
-    y         => 0 - 20,
-    w         => $width + 40,
-    h         => $height + 40,
-    max_items => 2,
-    max_depth => 4,
-);
-
 foreach ( 1 .. 150 ) {
     my $rect = Collision::Util::Rect->new(
         x   => rand() * $width,
@@ -43,8 +34,17 @@ foreach ( 1 .. 150 ) {
         v_y => rand() * 10 - 5,
     );
     push @rects, $rect;
-    $quadtree->insert($rect);
 }
+
+my $quadtree = Collision::Util::Quadtree->new(
+    x         => 0 - 20,
+    y         => 0 - 20,
+    w         => $width + 40,
+    h         => $height + 40,
+    max_items => 2,
+    max_depth => 4,
+    items     => \@rects,
+);
 
 my $app = SDLx::App->new(
     title  => 'Collision::Util::Quadtree Example',
