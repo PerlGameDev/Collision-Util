@@ -240,7 +240,7 @@ is_deeply( $rect14->check_collision_dynamic( $rect13, 1 ), [ 0, -1 ] );
 #  |16|
 #  +--+
 my $rect15 = Rect->new( x => 1, y => 0, w => 5, h => 4, v_x => 0, v_y => 0 );
-my $rect16 = Rect->new( x => 2, y => 4, w => 3, h => 2, v_x => 0, v_y => 0 );
+my $rect16 = Rect->new( x => 2, y => 6, w => 3, h => 2, v_x => 0, v_y => 0 );
 
 is_deeply( $rect15->check_collision_dynamic( $rect16, 1 ), [ 0, 0 ] );
 is_deeply( $rect16->check_collision_dynamic( $rect15, 1 ), [ 0, 0 ] );
