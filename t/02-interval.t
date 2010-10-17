@@ -171,6 +171,12 @@ is_deeply( $rect7->check_collision_interval( $rect8, 1 ), [ 0, 0 ] );
 is_deeply( $rect8->check_collision_interval( $rect7, 1 ), [ 0, 0 ] );
 
 $rect7->v_x(3.0);
+TODO: {
+    local $TODO = 'diagonal movement';
+    is_deeply( $rect7->check_collision_interval( $rect8, 1 ), [ -1, 0 ] );
+    is_deeply( $rect8->check_collision_interval( $rect7, 1 ), [ 1,  0 ] );
+}
+
 $rect7->v_y(0.0);
 is_deeply( $rect7->check_collision_interval( $rect8, 1 ), [ -1, 0 ] );
 is_deeply( $rect8->check_collision_interval( $rect7, 1 ), [ 1,  0 ] );
