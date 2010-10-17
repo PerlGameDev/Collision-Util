@@ -360,54 +360,6 @@ sub _check_collision_dynamic {
     return $axis;
 }
 
-# _check_collision_dynamic_axis_side( [ [$x1, $x2], ... ],
-#   [ [$s_x1, $s_y1], [$s_x2, $s_y2]], [$v_x, $v_y] );
-#
-# Check if any of a set of points moving with the same velocity collide
-# with a stationary vertical line.
-#
-# Assumptions:
-#   The line is vertical ($s_x1 == $s_x2)
-#   The first point of the line is below the second ($s_y2 > $s_y1)
-#
-# Return Value:
-#    0 if there are no collisions.
-#    1 if any point collides with the right side of the line.
-#   -1 if any point collides with the left side of the line.
-#
-# TODO: Think of a better name for this function
-sub _check_collision_dynamic_axis_side {
-    my ($points, $side, $v) = @_;
-
-    my ($s_x1, $s_y1) = @{ $side->[0] };
-    my ($s_x2, $s_y2) = @{ $side->[1] };
-    my ($v_x,  $v_y)  = @$v;
-
-    my $direction = $v_x <=> 0;
-
-    foreach my $point (@$points) {
-        my ($x1, $y1) = @$point;
-        my ($x2, $y2) = ($x1 + $v_x, $y1 + $v_y);
-
-        next if $direction == ($x1 <=> $s_x1) || $direction != ($x2 <=> $s_x1);
-
-        if ($v_y == 0) {
-            if ($y2 >= $s_y1 && $y2 <= $s_y2) {
-                return -$direction;
-            }
-        } else {
-            my $m = ($y1 - $y2) / ($x1 - $x2);
-            my $b = $y1 - $m * $x1;
-            my $y = $m * $s_x1 + $b;
-
-            if ($y >= $s_y1 && $y <= $s_y2) {
-                return -$direction;
-            }
-        }
-    }
-    return 0;
-}
-
 # This implementation relies on the fact if two rectangles with the same
 # orientation collide (in this case the sides are parallel to the x-axis
 # and y-axis) one or both corners of the smaller side involved in the
@@ -494,6 +446,54 @@ sub _check_collision_dynamic_axis_rect {
     };
     Carp::croak "elements should have x, y, w, h, v_x and v_y accessors: $@" if $@;
     return $axis;
+}
+
+# _check_collision_dynamic_axis_side( [ [$x1, $x2], ... ],
+#   [ [$s_x1, $s_y1], [$s_x2, $s_y2]], [$v_x, $v_y] );
+#
+# Check if any of a set of points moving with the same velocity collide
+# with a stationary vertical line.
+#
+# Assumptions:
+#   The line is vertical ($s_x1 == $s_x2)
+#   The first point of the line is below the second ($s_y2 > $s_y1)
+#
+# Return Value:
+#    0 if there are no collisions.
+#    1 if any point collides with the right side of the line.
+#   -1 if any point collides with the left side of the line.
+#
+# TODO: Think of a better name for this function
+sub _check_collision_dynamic_axis_side {
+    my ($points, $side, $v) = @_;
+
+    my ($s_x1, $s_y1) = @{ $side->[0] };
+    my ($s_x2, $s_y2) = @{ $side->[1] };
+    my ($v_x,  $v_y)  = @$v;
+
+    my $direction = $v_x <=> 0;
+
+    foreach my $point (@$points) {
+        my ($x1, $y1) = @$point;
+        my ($x2, $y2) = ($x1 + $v_x, $y1 + $v_y);
+
+        next if $direction == ($x1 <=> $s_x1) || $direction != ($x2 <=> $s_x1);
+
+        if ($v_y == 0) {
+            if ($y2 >= $s_y1 && $y2 <= $s_y2) {
+                return -$direction;
+            }
+        } else {
+            my $m = ($y1 - $y2) / ($x1 - $x2);
+            my $b = $y1 - $m * $x1;
+            my $y = $m * $s_x1 + $b;
+
+            if ($y >= $s_y1 && $y <= $s_y2) {
+                return -$direction;
+            }
+        }
+    }
+    return 0;
 }
 
 sub check_collision_rect {
