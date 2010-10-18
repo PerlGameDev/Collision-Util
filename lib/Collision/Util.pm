@@ -808,8 +808,10 @@ Both C<$source> and C<$target> must be objects with accessors for C<x>
 =head1 AUTHORS
 
 Breno G. de Oliveira, C<< <garu at cpan.org> >>
+
 Heikki MehtE<195>nen, C<< <heikki at mehtanen.fi> >>
 
+Jeffrey T. Palmer, C<< <jtpalmer at cpan.org> >>
 
 =head1 ACKNOWLEDGEMENTS
 
