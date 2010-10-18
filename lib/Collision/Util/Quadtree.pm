@@ -160,7 +160,7 @@ L<Algorithm::QuadTree>
 
 =head1 AUTHORS
 
-Jeffrey T. Palmer C<< <jtpalmer at cpan.org> >>
+Jeffrey T. Palmer, C<< <jtpalmer at cpan.org> >>
 
 =head1 BUGS
 
