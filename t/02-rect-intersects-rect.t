@@ -277,9 +277,15 @@ $rect[46] = Rect->new( x => 3, y => 1, w => 4, h => 4 );
 ok( $rect[45]->intersects( $rect[46] ), 'rect[45] intersects rect[46]');
 ok( $rect[46]->intersects( $rect[45] ), 'rect[46] intersects rect[45]');
 
-# +--++--+ overlapping
+# +--++--+
 # |47||48|
 # +--++--+
+# +---+
+# |47 |
+# +---+
+#    +---+
+#    | 48|
+#    +---+
 
 $rect[47] = Rect->new( x => 1, y => 1, w => 4, h => 2 );
 $rect[48] = Rect->new( x => 4, y => 1, w => 4, h => 2 );
@@ -355,12 +361,12 @@ $rect[60] = Rect->new( x => 4, y => 2, w => 4, h => 2 );
 ok( $rect[59]->intersects( $rect[60] ), 'rect[59] intersects rect[60]');
 ok( $rect[60]->intersects( $rect[59] ), 'rect[60] intersects rect[59]');
 
-# +--+ overlapping
-# |61|
-# +--+
-# +--+
-# |62|
-# +--+
+# +--+ +--+
+# |61| |61|
+# +--+ |  | +--+
+# +--+ +--+ |  |
+# |62|      |62|
+# +--+      +--+
 
 $rect[61] = Rect->new( x => 1, y => 1, w => 3, h => 3 );
 $rect[62] = Rect->new( x => 1, y => 3, w => 3, h => 3 );
@@ -445,5 +451,180 @@ $rect[74] = Rect->new( x => 2, y => 3, w => 3, h => 3 );
 
 ok( $rect[73]->intersects( $rect[74] ), 'rect[73] intersects rect[74]');
 ok( $rect[74]->intersects( $rect[73] ), 'rect[74] intersects rect[73]');
+
+# +--+--+ +--+ +-----+
+# |  |75| |  | |   75|
+# +--+--+ |  | +-----+
+# |76|    |76|
+# +--+    +--+
+
+$rect[75] = Rect->new( x => 1, y => 1, w => 6, h => 2 );
+$rect[76] = Rect->new( x => 1, y => 1, w => 3, h => 4 );
+
+ok( $rect[75]->intersects( $rect[76] ), 'rect[75] intersects rect[76]');
+ok( $rect[76]->intersects( $rect[75] ), 'rect[76] intersects rect[75]');
+
+# +--+--+--+
+# |77|  |  |
+# +--+--+--+
+#    |78|
+#    +--+
+
+$rect[77] = Rect->new( x => 1, y => 1, w => 9, h => 2 );
+$rect[78] = Rect->new( x => 4, y => 1, w => 3, h => 4 );
+
+ok( $rect[77]->intersects( $rect[78] ), 'rect[77] intersects rect[78]');
+ok( $rect[78]->intersects( $rect[77] ), 'rect[78] intersects rect[77]');
+
+# +--+--+
+# |79|  |
+# +--+--+
+#    |80|
+#    +--+
+
+$rect[79] = Rect->new( x => 1, y => 1, w => 6, h => 2 );
+$rect[80] = Rect->new( x => 4, y => 1, w => 3, h => 4 );
+
+ok( $rect[79]->intersects( $rect[80] ), 'rect[79] intersects rect[80]');
+ok( $rect[80]->intersects( $rect[79] ), 'rect[80] intersects rect[79]');
+
+# +--+
+# |81|
+# +--+--+
+# |  |82|
+# +--+--+
+
+$rect[81] = Rect->new( x => 1, y => 1, w => 3, h => 4 );
+$rect[82] = Rect->new( x => 1, y => 3, w => 6, h => 2 );
+
+ok( $rect[81]->intersects( $rect[82] ), 'rect[81] intersects rect[82]');
+ok( $rect[82]->intersects( $rect[81] ), 'rect[82] intersects rect[81]');
+
+#    +--+
+#    |83|
+# +--+--+--+
+# |84|  |  |
+# +--+--+--+
+
+$rect[83] = Rect->new( x => 4, y => 1, w => 3, h => 4 );
+$rect[84] = Rect->new( x => 1, y => 3, w => 9, h => 2 );
+
+ok( $rect[83]->intersects( $rect[84] ), 'rect[83] intersects rect[84]');
+ok( $rect[84]->intersects( $rect[83] ), 'rect[84] intersects rect[83]');
+
+#    +--+
+#    |85|
+# +--+--+
+# |86|  |
+# +--+--+
+
+$rect[85] = Rect->new( x => 4, y => 1, w => 3, h => 4 );
+$rect[86] = Rect->new( x => 1, y => 3, w => 6, h => 2 );
+
+ok( $rect[85]->intersects( $rect[86] ), 'rect[85] intersects rect[86]');
+ok( $rect[86]->intersects( $rect[85] ), 'rect[86] intersects rect[85]');
+
+#    +--+
+#    |87|
+# +--+--+
+# |88|  |
+# +--+--+
+#    |  |
+#    +--+
+
+$rect[87] = Rect->new( x => 4, y => 1, w => 3, h => 6 );
+$rect[88] = Rect->new( x => 1, y => 3, w => 6, h => 2 );
+
+ok( $rect[87]->intersects( $rect[88] ), 'rect[87] intersects rect[88]');
+ok( $rect[88]->intersects( $rect[87] ), 'rect[88] intersects rect[87]');
+
+# +--+
+# |89|
+# +--+--+
+# |  |90|
+# +--+--+
+# |  |
+# +--+
+
+$rect[89] = Rect->new( x => 1, y => 1, w => 3, h => 6 );
+$rect[90] = Rect->new( x => 1, y => 3, w => 6, h => 2 );
+
+ok( $rect[89]->intersects( $rect[90] ), 'rect[89] intersects rect[90]');
+ok( $rect[90]->intersects( $rect[89] ), 'rect[90] intersects rect[89]');
+
+#    +--+
+#    |91|
+# +--+--+--+
+# |92|  |  |
+# +--+--+--+
+#    |  |
+#    +--+
+
+$rect[91] = Rect->new( x => 4, y => 1, w => 3, h => 6 );
+$rect[92] = Rect->new( x => 1, y => 3, w => 9, h => 2 );
+
+ok( $rect[91]->intersects( $rect[92] ), 'rect[91] intersects rect[92]');
+ok( $rect[92]->intersects( $rect[91] ), 'rect[92] intersects rect[91]');
+
+# +--+ +--+ +--+
+# |93| |  | |93|
+# +--+ |  | +--+
+# |94| |94|
+# +--+ +--+
+
+$rect[93] = Rect->new( x => 1, y => 1, w => 3, h => 2 );
+$rect[94] = Rect->new( x => 1, y => 1, w => 3, h => 4 );
+
+ok( $rect[93]->intersects( $rect[94] ), 'rect[93] intersects rect[94]');
+ok( $rect[94]->intersects( $rect[93] ), 'rect[94] intersects rect[93]');
+
+# +--+ +--+
+# |95| |95|
+# +--+ |  | +--+
+# |96| |  | |96|
+# +--+ +--+ +--+
+
+$rect[95] = Rect->new( x => 1, y => 1, w => 3, h => 4 );
+$rect[96] = Rect->new( x => 1, y => 3, w => 3, h => 2 );
+
+ok( $rect[95]->intersects( $rect[96] ), 'rect[95] intersects rect[96]');
+ok( $rect[96]->intersects( $rect[95] ), 'rect[96] intersects rect[95]');
+
+
+# +--+--+
+# |97|98|
+# +--+--+
+#
+# +-----+
+# |   98|
+# +-----+
+#
+# +--+
+# |97|
+# +--+
+
+$rect[97] = Rect->new( x => 1, y => 1, w => 3, h => 2 );
+$rect[98] = Rect->new( x => 1, y => 1, w => 6, h => 2 );
+
+ok( $rect[97]->intersects( $rect[98] ), 'rect[97] intersects rect[98]');
+ok( $rect[98]->intersects( $rect[97] ), 'rect[98] intersects rect[97]');
+
+# +--+---+
+# |99|100|
+# +--+---+
+#
+# +------+
+# |99    |
+# +------+
+#
+#    +---+
+#    |100|
+#    +---+
+
+$rect[99] = Rect->new( x => 1, y => 1, w => 7, h => 2 );
+$rect[100] = Rect->new( x => 4, y => 1, w => 4, h => 2 );
+
+ok( $rect[99]->intersects( $rect[100] ), 'rect[99] intersects rect[100]');
+ok( $rect[100]->intersects( $rect[99] ), 'rect[100] intersects rect[99]');
 
 done_testing();

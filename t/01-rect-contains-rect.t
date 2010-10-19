@@ -277,9 +277,15 @@ $rect[46] = Rect->new( x => 3, y => 1, w => 4, h => 4 );
 ok( !$rect[45]->contains( $rect[46] ), 'rect[45] does not contains rect[46]');
 ok( !$rect[46]->contains( $rect[45] ), 'rect[46] does not contains rect[45]');
 
-# +--++--+ overlapping
+# +--++--+
 # |47||48|
 # +--++--+
+# +---+
+# |47 |
+# +---+
+#    +---+
+#    | 48|
+#    +---+
 
 $rect[47] = Rect->new( x => 1, y => 1, w => 4, h => 2 );
 $rect[48] = Rect->new( x => 4, y => 1, w => 4, h => 2 );
@@ -355,12 +361,12 @@ $rect[60] = Rect->new( x => 4, y => 2, w => 4, h => 2 );
 ok( !$rect[59]->contains( $rect[60] ), 'rect[59] does not contains rect[60]');
 ok( !$rect[60]->contains( $rect[59] ), 'rect[60] does not contains rect[59]');
 
-# +--+ overlapping
-# |61|
-# +--+
-# +--+
-# |62|
-# +--+
+# +--+ +--+
+# |61| |61|
+# +--+ |  | +--+
+# +--+ +--+ |  |
+# |62|      |62|
+# +--+      +--+
 
 $rect[61] = Rect->new( x => 1, y => 1, w => 3, h => 3 );
 $rect[62] = Rect->new( x => 1, y => 3, w => 3, h => 3 );
@@ -445,5 +451,179 @@ $rect[74] = Rect->new( x => 2, y => 3, w => 3, h => 3 );
 
 ok( !$rect[73]->contains( $rect[74] ), 'rect[73] does not contains rect[74]');
 ok( !$rect[74]->contains( $rect[73] ), 'rect[74] does not contains rect[73]');
+
+# +--+--+ +--+ +-----+
+# |  |75| |  | |   75|
+# +--+--+ |  | +-----+
+# |76|    |76|
+# +--+    +--+
+
+$rect[75] = Rect->new( x => 1, y => 1, w => 6, h => 2 );
+$rect[76] = Rect->new( x => 1, y => 1, w => 3, h => 4 );
+
+ok( !$rect[75]->contains( $rect[76] ), 'rect[75] does not contains rect[76]');
+ok( !$rect[76]->contains( $rect[75] ), 'rect[76] does not contains rect[75]');
+
+# +--+--+--+
+# |77|  |  |
+# +--+--+--+
+#    |78|
+#    +--+
+
+$rect[77] = Rect->new( x => 1, y => 1, w => 9, h => 2 );
+$rect[78] = Rect->new( x => 4, y => 1, w => 3, h => 4 );
+
+ok( !$rect[77]->contains( $rect[78] ), 'rect[77] does not contains rect[78]');
+ok( !$rect[78]->contains( $rect[77] ), 'rect[78] does not contains rect[77]');
+
+# +--+--+
+# |79|  |
+# +--+--+
+#    |80|
+#    +--+
+
+$rect[79] = Rect->new( x => 1, y => 1, w => 6, h => 2 );
+$rect[80] = Rect->new( x => 4, y => 1, w => 3, h => 4 );
+
+ok( !$rect[79]->contains( $rect[80] ), 'rect[79] does not contains rect[80]');
+ok( !$rect[80]->contains( $rect[79] ), 'rect[80] does not contains rect[79]');
+
+# +--+
+# |81|
+# +--+--+
+# |  |82|
+# +--+--+
+
+$rect[81] = Rect->new( x => 1, y => 1, w => 3, h => 4 );
+$rect[82] = Rect->new( x => 1, y => 3, w => 6, h => 2 );
+
+ok( !$rect[81]->contains( $rect[82] ), 'rect[81] does not contains rect[82]');
+ok( !$rect[82]->contains( $rect[81] ), 'rect[82] does not contains rect[81]');
+
+#    +--+
+#    |83|
+# +--+--+--+
+# |84|  |  |
+# +--+--+--+
+
+$rect[83] = Rect->new( x => 4, y => 1, w => 3, h => 4 );
+$rect[84] = Rect->new( x => 1, y => 3, w => 9, h => 2 );
+
+ok( !$rect[83]->contains( $rect[84] ), 'rect[83] does not contains rect[84]');
+ok( !$rect[84]->contains( $rect[83] ), 'rect[84] does not contains rect[83]');
+
+#    +--+
+#    |85|
+# +--+--+
+# |86|  |
+# +--+--+
+
+$rect[85] = Rect->new( x => 4, y => 1, w => 3, h => 4 );
+$rect[86] = Rect->new( x => 1, y => 3, w => 6, h => 2 );
+
+ok( !$rect[85]->contains( $rect[86] ), 'rect[85] does not contains rect[86]');
+ok( !$rect[86]->contains( $rect[85] ), 'rect[86] does not contains rect[85]');
+
+#    +--+
+#    |87|
+# +--+--+
+# |88|  |
+# +--+--+
+#    |  |
+#    +--+
+
+$rect[87] = Rect->new( x => 4, y => 1, w => 3, h => 6 );
+$rect[88] = Rect->new( x => 1, y => 3, w => 6, h => 2 );
+
+ok( !$rect[87]->contains( $rect[88] ), 'rect[87] does not contains rect[88]');
+ok( !$rect[88]->contains( $rect[87] ), 'rect[88] does not contains rect[87]');
+
+# +--+
+# |89|
+# +--+--+
+# |  |90|
+# +--+--+
+# |  |
+# +--+
+
+$rect[89] = Rect->new( x => 1, y => 1, w => 3, h => 6 );
+$rect[90] = Rect->new( x => 1, y => 3, w => 6, h => 2 );
+
+ok( !$rect[89]->contains( $rect[90] ), 'rect[89] does not contains rect[90]');
+ok( !$rect[90]->contains( $rect[89] ), 'rect[90] does not contains rect[89]');
+
+#    +--+
+#    |91|
+# +--+--+--+
+# |92|  |  |
+# +--+--+--+
+#    |  |
+#    +--+
+
+$rect[91] = Rect->new( x => 4, y => 1, w => 3, h => 6 );
+$rect[92] = Rect->new( x => 1, y => 3, w => 9, h => 2 );
+
+ok( !$rect[91]->contains( $rect[92] ), 'rect[91] does not contains rect[92]');
+ok( !$rect[92]->contains( $rect[91] ), 'rect[92] does not contains rect[91]');
+
+# +--+ +--+ +--+
+# |93| |  | |93|
+# +--+ |  | +--+
+# |94| |94|
+# +--+ +--+
+
+$rect[93] = Rect->new( x => 1, y => 1, w => 3, h => 2 );
+$rect[94] = Rect->new( x => 1, y => 1, w => 3, h => 4 );
+
+ok( !$rect[93]->contains( $rect[94] ), 'rect[93] does not contains rect[94]');
+ok( $rect[94]->contains( $rect[93] ), 'rect[94] contains rect[93]');
+
+# +--+ +--+
+# |95| |95|
+# +--+ |  | +--+
+# |96| |  | |96|
+# +--+ +--+ +--+
+
+$rect[95] = Rect->new( x => 1, y => 1, w => 3, h => 4 );
+$rect[96] = Rect->new( x => 1, y => 3, w => 3, h => 2 );
+
+ok( $rect[95]->contains( $rect[96] ), 'rect[95] contains rect[96]');
+ok( !$rect[96]->contains( $rect[95] ), 'rect[96] does not contains rect[95]');
+
+# +--+--+
+# |97|98|
+# +--+--+
+#
+# +-----+
+# |   98|
+# +-----+
+#
+# +--+
+# |97|
+# +--+
+
+$rect[97] = Rect->new( x => 1, y => 1, w => 3, h => 2 );
+$rect[98] = Rect->new( x => 1, y => 1, w => 6, h => 2 );
+
+ok( !$rect[97]->contains( $rect[98] ), 'rect[97] does not contains rect[98]');
+ok( $rect[98]->contains( $rect[97] ), 'rect[98] contains rect[97]');
+
+# +--+---+
+# |99|100|
+# +--+---+
+#
+# +------+
+# |99    |
+# +------+
+#
+#    +---+
+#    |100|
+#    +---+
+
+$rect[99] = Rect->new( x => 1, y => 1, w => 7, h => 2 );
+$rect[100] = Rect->new( x => 4, y => 1, w => 4, h => 2 );
+
+ok( $rect[99]->contains( $rect[100] ), 'rect[99] contains rect[100]');
+ok( !$rect[100]->contains( $rect[99] ), 'rect[100] does not contains rect[99]');
 
 done_testing();
