@@ -624,4 +624,36 @@ $rect[100] = Rect->new( x => 4, y => 1, w => 4, h => 2 );
 ok( $rect[99]->contains( $rect[100] ),  'rect[99] contains rect[100]' );
 ok( !$rect[100]->contains( $rect[99] ), 'rect[100] does not contains rect[99]' );
 
+# +---+---+---+
+# |101|102|   |
+# +---+---+---+
+#
+# +-----------+
+# |101        |
+# +-----------+
+#
+#     +---+
+#     |102|
+#     +---+
+
+$rect[101] = Rect->new( x => 1, y => 1, w => 12, h => 2 );
+$rect[102] = Rect->new( x => 5, y => 1, w => 4,  h => 2 );
+
+ok( $rect[101]->contains( $rect[102] ),  'rect[101] contains rect[102]' );
+ok( !$rect[102]->contains( $rect[101] ), 'rect[102] does not contains rect[101]' );
+
+# +---+ +---+
+# |103| |103|
+# +---+ |   | +---+
+# |104| |   | |104|
+# +---+ |   | +---+
+# |   | |   |
+# +---+ +---+
+
+$rect[103] = Rect->new( x => 1, y => 1, w => 4, h => 6 );
+$rect[104] = Rect->new( x => 1, y => 3, w => 4, h => 2 );
+
+ok( $rect[103]->contains( $rect[104] ),  'rect[103] contains rect[104]' );
+ok( !$rect[104]->contains( $rect[103] ), 'rect[104] does not contains rect[103]' );
+
 done_testing();
