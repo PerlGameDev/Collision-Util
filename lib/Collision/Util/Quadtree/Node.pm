@@ -141,7 +141,7 @@ sub _push_down {
 
     if ( $self->_insert_in_child($item) ) {
         my $id = refaddr $self;
-        @{ $_items{$id} } = grep { refaddr $_ ne refaddr $item } @{ $_items{$id} };
+        $self->remove($item);
         return 1;
     }
     else {
@@ -154,7 +154,7 @@ sub _push_up {
 
     my $id = refaddr $self;
 
-    @{ $_items{$id} } = grep { refaddr $_ ne refaddr $item } @{ $_items{$id} };
+    $self->remove($item);
 
     $_parent{$id}->insert($item);
 }
@@ -169,6 +169,14 @@ sub update {
             $self->_push_up($item);
         }
     }
+}
+
+sub remove {
+    my ( $self, $item ) = @_;
+
+    my $id = refaddr $self;
+
+    @{ $_items{$id} } = grep { refaddr $_ ne refaddr $item } @{ $_items{$id} };
 }
 
 sub get_items {

@@ -39,6 +39,12 @@ sub update {
     $self->{node_for_item}->{refaddr $item}->update($item);
 }
 
+sub remove {
+    my ( $self, $item ) = @_;
+    $self->{node_for_item}->{refaddr $item}->remove($item);
+    undef $self->{node_for_item}->{refaddr $item};
+}
+
 sub register_item {
     my ($self, $item, $node) = @_;
     $self->{node_for_item}->{refaddr $item} = $node;
@@ -145,6 +151,11 @@ item must have already been inserted into the quadtree before this
 method is used on the item.  This method should be called after the
 inserted item's position has changed and before C<get_collisions> is
 called.
+
+=head2 remove($rect)
+
+Remove an item from the quadtree.  The item must have already been
+inserted into the quadtree before this method is used on the item.
 
 =head2 get_collisions()
 
