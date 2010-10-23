@@ -162,7 +162,7 @@ sub _push_up {
     $_parent{$id}->insert($item);
 }
 
-sub move {
+sub update {
     my ( $self, $item ) = @_;
 
     my $id = refaddr $self;

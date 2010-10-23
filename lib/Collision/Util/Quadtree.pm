@@ -34,9 +34,9 @@ sub insert {
     $self->{root}->insert($item);
 }
 
-sub move {
+sub update {
     my ( $self, $item ) = @_;
-    $self->{node_for_item}->{refaddr $item}->move($item);
+    $self->{node_for_item}->{refaddr $item}->update($item);
 }
 
 sub register_item {
@@ -71,9 +71,9 @@ Collision::Util::Quadtree - Collision detection using a quadtree
     # After changing the position of an item that has been inserted
     # into the quadtree, update their position in the tree before
     # calculating collisions.
-    $quadtree->move($rect1);
-    $quadtree->move($rect2);
-    $quadtree->move($rect3);
+    $quadtree->update($rect1);
+    $quadtree->update($rect2);
+    $quadtree->update($rect3);
     $collisions = $quadtree->get_collisions();
 
 =head1 DESCRIPTION
@@ -138,12 +138,13 @@ supported are rectangles.  Any object that is inserted must implement
 methods C<x>, C<y>, C<w>, C<h> and C<intersects>.  See
 L<Collision::Util::Rect> for an implementation of C<intersects>.
 
-=head2 move($rect)
+=head2 update($rect)
 
-Move an item in the quadtree.  The item must have already been inserted
-into the quadtree before this method is used on the item.  This method
-should be called after the inserted item's position has changed and
-before C<get_collisions> is called.
+Update the position of an item in the quadtree after it has moved.  The
+item must have already been inserted into the quadtree before this
+method is used on the item.  This method should be called after the
+inserted item's position has changed and before C<get_collisions> is
+called.
 
 =head2 get_collisions()
 

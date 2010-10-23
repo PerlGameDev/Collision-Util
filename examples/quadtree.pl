@@ -54,7 +54,7 @@ my $app = SDLx::App->new(
 
 sub get_collisions {
     if ( $algorithm eq 'quadtree' ) {
-        $quadtree->move($_) foreach @rects;
+        $quadtree->update($_) foreach @rects;
         return $quadtree->get_collisions();
     }
     elsif ( $algorithm eq 'bruteforce' ) {
