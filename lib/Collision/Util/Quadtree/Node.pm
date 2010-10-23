@@ -29,7 +29,7 @@ sub new {
     $_max_items{$id}      = $options{max_items};
     $_max_depth{$id}      = $options{max_depth};
     $_children{$id}       = [];
-    $_items{$id}          = [];
+    $_items{$id}          = {};
     $_is_partitioned{$id} = 0;
 
     return $self;
@@ -72,10 +72,10 @@ sub insert {
 
     if ( !$self->_insert_in_child($item) ) {
 
-        push @{ $_items{$id} }, $item;
+        $_items{$id}->{ refaddr $item} = $item;
         $_tree{$id}->register_item( $item, $self );
 
-        if ( !$_is_partitioned{$id} && @{ $_items{$id} } > $_max_items{$id} ) {
+        if ( !$_is_partitioned{$id} && keys( %{ $_items{$id} } ) > $_max_items{$id} ) {
             $self->partition();
         }
     }
@@ -129,8 +129,8 @@ sub partition {
 
     $_is_partitioned{$id} = 1;
 
-    # Copy array, because it may be modified during the loop.
-    my @items = @{ $_items{$id} };
+    # Copy items array, because it may be modified during the loop.
+    my @items = values %{ $_items{$id} };
     foreach my $item (@items) {
         $self->_push_down($item);
     }
@@ -174,9 +174,7 @@ sub update {
 sub remove {
     my ( $self, $item ) = @_;
 
-    my $id = refaddr $self;
-
-    @{ $_items{$id} } = grep { refaddr $_ ne refaddr $item } @{ $_items{$id} };
+    delete $_items{ refaddr $self}->{ refaddr $item};
 }
 
 sub get_items {
@@ -184,7 +182,7 @@ sub get_items {
 
     my $id = refaddr $self;
     if ( $_rect{$id}->intersects($rect) ) {
-        my @items = @{ $_items{$id} };
+        my @items = values %{ $_items{$id} };
 
         if ( !$rect->contains( $_rect{$id} ) ) {
             @items = grep { $rect->intersects($_) } @items;
@@ -210,12 +208,13 @@ sub get_collisions {
 
     my @collisions;
 
-    my $max = @{ $_items{$id} } - 1;
+    my @items = values %{ $_items{$id} };
+    my $max   = $#items;
     foreach my $item_id ( 0 .. $max ) {
-        my $item = $_items{$id}->[$item_id];
+        my $item = $items[$item_id];
         if ( $item->intersects($rect) ) {
             foreach my $other_id ( $item_id + 1 .. $max ) {
-                my $other = $_items{$id}->[$other_id];
+                my $other = $items[$other_id];
                 if ( $item->intersects($other) ) {
                     push @collisions, $item;
                     push @collisions, $other;
