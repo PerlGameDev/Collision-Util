@@ -42,7 +42,7 @@ sub update {
 sub remove {
     my ( $self, $item ) = @_;
     $self->{node_for_item}->{refaddr $item}->remove($item);
-    undef $self->{node_for_item}->{refaddr $item};
+    delete $self->{node_for_item}->{refaddr $item};
 }
 
 sub register_item {
