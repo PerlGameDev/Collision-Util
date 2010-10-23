@@ -51,7 +51,7 @@ sub DESTROY {
 }
 
 sub rect {
-    return $_rect{refaddr $_[0]};
+    return $_rect{ refaddr $_[0] };
 }
 
 sub insert {
@@ -75,8 +75,7 @@ sub insert {
         push @{ $_items{$id} }, $item;
         $_tree{$id}->register_item( $item, $self );
 
-        if ( !$_is_partitioned{$id} && @{ $_items{$id} } > $_max_items{$id} )
-        {
+        if ( !$_is_partitioned{$id} && @{ $_items{$id} } > $_max_items{$id} ) {
             $self->partition();
         }
     }
@@ -142,8 +141,7 @@ sub _push_down {
 
     if ( $self->_insert_in_child($item) ) {
         my $id = refaddr $self;
-        @{ $_items{$id} }
-            = grep { refaddr $_ ne refaddr $item } @{ $_items{$id} };
+        @{ $_items{$id} } = grep { refaddr $_ ne refaddr $item } @{ $_items{$id} };
         return 1;
     }
     else {
@@ -156,8 +154,7 @@ sub _push_up {
 
     my $id = refaddr $self;
 
-    @{ $_items{$id} }
-        = grep { refaddr $_ ne refaddr $item } @{ $_items{$id} };
+    @{ $_items{$id} } = grep { refaddr $_ ne refaddr $item } @{ $_items{$id} };
 
     $_parent{$id}->insert($item);
 }
@@ -181,7 +178,7 @@ sub get_items {
     if ( $_rect{$id}->intersects($rect) ) {
         my @items = @{ $_items{$id} };
 
-        if ( !$rect->contains($_rect{$id}) ) {
+        if ( !$rect->contains( $_rect{$id} ) ) {
             @items = grep { $rect->intersects($_) } @items;
         }
 
@@ -218,7 +215,7 @@ sub get_collisions {
             }
             if ( $_is_partitioned{$id} ) {
                 foreach my $child ( @{ $_children{$id} } ) {
-                    if ( $item->intersects($child->rect) ) {
+                    if ( $item->intersects( $child->rect ) ) {
                         foreach my $other ( @{ $child->get_items($rect) } ) {
                             if ( $item->intersects($other) ) {
                                 push @collisions, $item;
