@@ -10,8 +10,8 @@ sub new {
 
     my $self = bless {}, $class;
 
-    $options{max_depth} = 7 unless exists $options{max_depth};
-    $options{max_items} = 8 unless exists $options{max_items};
+    $options{max_depth} = 4 unless exists $options{max_depth};
+    $options{max_items} = 1 unless exists $options{max_items};
 
     $self->{root} = Collision::Util::Quadtree::Node->new(
         %options,
