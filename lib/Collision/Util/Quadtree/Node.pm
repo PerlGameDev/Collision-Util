@@ -73,7 +73,7 @@ sub insert {
     if ( !$self->_insert_in_child($item) ) {
 
         $_items{$id}->{ refaddr $item} = $item;
-        $_tree{$id}->register_item( $item, $self );
+        $_tree{$id}->_register_item( $item, $self );
 
         if ( !$_is_partitioned{$id} && keys( %{ $_items{$id} } ) > $_max_items{$id} ) {
             $self->partition();

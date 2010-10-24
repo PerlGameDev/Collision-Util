@@ -45,7 +45,7 @@ sub remove {
     delete $self->{node_for_item}->{refaddr $item};
 }
 
-sub register_item {
+sub _register_item {
     my ($self, $item, $node) = @_;
     $self->{node_for_item}->{refaddr $item} = $node;
 }
