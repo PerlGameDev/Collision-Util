@@ -27,10 +27,7 @@ my $collisions = $quadtree->get_collisions();
 ok( $collisions, 'Got $collisions' );
 isa_ok( $collisions, 'ARRAY', '$collisions' );
 
-TODO: {
-    local $TODO = 'Items that collide with multiple items are returned multiple times';
-    is( scalar @$collisions, scalar @rects, 'Same number of collisions as items' );
-}
+is( scalar @$collisions, scalar @rects, 'Same number of collisions as items' );
 
 is_deeply( [ uniq sort @$collisions ], [ sort @rects ], 'All items collide' );
 
@@ -39,10 +36,7 @@ $quadtree->update( $rects[0] );
 
 $collisions = $quadtree->get_collisions();
 
-TODO: {
-    local $TODO = 'Items that collide with multiple items are returned multiple times';
-    is( scalar @$collisions, scalar @rects - 1, 'Same number of collisions as items' );
-}
+is( scalar @$collisions, scalar @rects - 1, 'Correct number of collisions after moving one item' );
 
 is_deeply(
     [ uniq sort @$collisions ],
@@ -54,10 +48,8 @@ $quadtree->remove( $rects[$#rects] );
 
 $collisions = $quadtree->get_collisions();
 
-TODO: {
-    local $TODO = 'Items that collide with multiple items are returned multiple times';
-    is( scalar @$collisions, scalar @rects - 2, 'Same number of collisions as items' );
-}
+is( scalar @$collisions, scalar @rects - 2,
+    'Correct number of collisions after moving one item and removing one item' );
 
 is_deeply(
     [ uniq sort @$collisions ],

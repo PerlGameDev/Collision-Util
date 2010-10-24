@@ -3,6 +3,7 @@ package Collision::Util::Quadtree;
 use strict;
 use warnings;
 
+use List::MoreUtils qw(uniq);
 use Collision::Util::Quadtree::Node;
 
 sub new {
@@ -55,7 +56,7 @@ sub get_collisions {
 
     $rect ||= $self->{root}->rect;
 
-    return $self->{root}->get_collisions($rect);
+    return [ uniq @{ $self->{root}->get_collisions($rect) } ];
 }
 
 1;
