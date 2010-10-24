@@ -32,7 +32,7 @@ TODO: {
     is( scalar @$collisions, scalar @rects, 'Same number of collisions as items' );
 }
 
-is_deeply( [ uniq @$collisions ], \@rects, 'All items collide' );
+is_deeply( [ uniq sort @$collisions ], [ sort @rects ], 'All items collide' );
 
 $rects[0]->x(90);
 $quadtree->update( $rects[0] );
@@ -44,7 +44,11 @@ TODO: {
     is( scalar @$collisions, scalar @rects - 1, 'Same number of collisions as items' );
 }
 
-is_deeply( [ uniq @$collisions ], [ @rects[ 1 .. $#rects ] ], 'All items collide except the one that was moved' );
+is_deeply(
+    [ uniq sort @$collisions ],
+    [ sort @rects[ 1 .. $#rects ] ],
+    'All items collide except the one that was moved'
+);
 
 $quadtree->remove( $rects[$#rects] );
 
@@ -56,8 +60,8 @@ TODO: {
 }
 
 is_deeply(
-    [ uniq @$collisions ],
-    [ @rects[ 1 .. $#rects - 1 ] ],
+    [ uniq sort @$collisions ],
+    [ sort @rects[ 1 .. $#rects - 1 ] ],
     'All items collide except the one that was moved and the one that was removed'
 );
 
