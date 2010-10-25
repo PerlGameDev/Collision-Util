@@ -2,7 +2,6 @@ use strict;
 use warnings;
 
 use Collision::Util::Rect;
-use List::MoreUtils qw(uniq);
 use Test::More;
 
 BEGIN {
@@ -29,7 +28,7 @@ isa_ok( $collisions, 'ARRAY', '$collisions' );
 
 is( scalar @$collisions, scalar @rects, 'Same number of collisions as items' );
 
-is_deeply( [ uniq sort @$collisions ], [ sort @rects ], 'All items collide' );
+is_deeply( [ sort @$collisions ], [ sort @rects ], 'All items collide' );
 
 $rects[0]->x(90);
 $quadtree->update( $rects[0] );
@@ -39,7 +38,7 @@ $collisions = $quadtree->get_collisions();
 is( scalar @$collisions, scalar @rects - 1, 'Correct number of collisions after moving one item' );
 
 is_deeply(
-    [ uniq sort @$collisions ],
+    [ sort @$collisions ],
     [ sort @rects[ 1 .. $#rects ] ],
     'All items collide except the one that was moved'
 );
@@ -52,7 +51,7 @@ is( scalar @$collisions, scalar @rects - 2,
     'Correct number of collisions after moving one item and removing one item' );
 
 is_deeply(
-    [ uniq sort @$collisions ],
+    [ sort @$collisions ],
     [ sort @rects[ 1 .. $#rects - 1 ] ],
     'All items collide except the one that was moved and the one that was removed'
 );
