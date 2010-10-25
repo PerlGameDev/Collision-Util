@@ -37,18 +37,18 @@ sub insert {
 
 sub update {
     my ( $self, $item ) = @_;
-    $self->{node_for_item}->{refaddr $item}->update($item);
+    $self->{node_for_item}->{ refaddr $item}->update($item);
 }
 
 sub remove {
     my ( $self, $item ) = @_;
-    $self->{node_for_item}->{refaddr $item}->remove($item);
-    delete $self->{node_for_item}->{refaddr $item};
+    $self->{node_for_item}->{ refaddr $item}->remove($item);
+    delete $self->{node_for_item}->{ refaddr $item};
 }
 
 sub _register_item {
-    my ($self, $item, $node) = @_;
-    $self->{node_for_item}->{refaddr $item} = $node;
+    my ( $self, $item, $node ) = @_;
+    $self->{node_for_item}->{ refaddr $item} = $node;
 }
 
 sub get_collisions {
