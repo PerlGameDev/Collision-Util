@@ -32,7 +32,15 @@ sub new {
 
 sub insert {
     my ( $self, $item ) = @_;
-    $self->{root}->insert($item);
+
+    my $root = $self->{root};
+
+    if ( $root->rect->contains($item) ) {
+        $root->insert($item);
+    }
+    else {
+        warn "Item is outside of tree\n";
+    }
 }
 
 sub update {

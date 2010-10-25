@@ -54,21 +54,14 @@ sub rect {
     return $_rect{ refaddr $_[0] };
 }
 
+sub parent {
+    return $_parent{ refaddr $_[0] };
+}
+
 sub insert {
     my ( $self, $item ) = @_;
 
     my $id = refaddr $self;
-
-    if ( !$_rect{$id}->contains($item) ) {
-        my $parent = $_parent{$id};
-        if ( defined $parent ) {
-            $parent->insert($item);
-        }
-        else {
-            warn "Item is outside of tree\n";
-        }
-        return;
-    }
 
     if ( !$self->_insert_in_child($item) ) {
 
@@ -156,7 +149,16 @@ sub _push_up {
 
     $self->remove($item);
 
-    $_parent{$id}->insert($item);
+    my $current = $self;
+
+    while (defined $current) {
+        if ( $current->rect->contains($item) ) {
+            return $current->insert($item);
+        }
+        $current = $current->parent();
+    }
+
+    warn "Item has moved outside tree\n";
 }
 
 sub update {
@@ -165,9 +167,7 @@ sub update {
     my $id = refaddr $self;
 
     if ( !$self->_push_down($item) ) {
-        if ( defined $_parent{$id} ) {
-            $self->_push_up($item);
-        }
+        $self->_push_up($item);
     }
 }
 
