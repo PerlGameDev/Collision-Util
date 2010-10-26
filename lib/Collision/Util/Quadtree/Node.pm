@@ -133,7 +133,6 @@ sub _push_down {
     my ( $self, $item ) = @_;
 
     if ( $self->_insert_in_child($item) ) {
-        my $id = refaddr $self;
         $self->remove($item);
         return 1;
     }
@@ -144,8 +143,6 @@ sub _push_down {
 
 sub _push_up {
     my ( $self, $item ) = @_;
-
-    my $id = refaddr $self;
 
     $self->remove($item);
 
@@ -163,8 +160,6 @@ sub _push_up {
 
 sub update {
     my ( $self, $item ) = @_;
-
-    my $id = refaddr $self;
 
     if ( !$self->_push_down($item) ) {
         $self->_push_up($item);
