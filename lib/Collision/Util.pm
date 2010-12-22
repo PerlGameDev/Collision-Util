@@ -10,10 +10,11 @@ BEGIN {
             check_contains check_contains_rect 
             check_collision check_collision_rect
             check_collision_interval check_collision_axis
+			check_collision_plain
     );
     our %EXPORT_TAGS = (
         all => \@EXPORT_OK,
-        std => [qw( check_contains check_collision )],
+        std => [qw( check_contains check_collision check_collision_plain)],
         axis => [qw( check_collision_axis )],
         interval => [qw( check_collision_interval )], 
     );
