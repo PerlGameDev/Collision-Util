@@ -301,6 +301,27 @@ sub check_collision_rect {
 }
 
 
+sub check_collision_plain {
+    my ( $x1, $y1, $w1, $h1, $x2, $y2, $w2, $h2 ) = @_;
+
+    my ( $l1, $l2, $r1, $r2, $t1, $t2, $b1, $b2 );
+
+    $l1 = $x1;
+    $l2 = $x2;
+    $r1 = $x1 + $w1;
+    $r2 = $x2 + $w2;
+    $t1 = $y1;
+    $t2 = $y2;
+    $b1 = $y1 + $h1, $b2 = $y2 + $h2;
+
+    return 0 if ( $b1 < $t2 );
+    return 0 if ( $t1 > $b2 );
+    return 0 if ( $r1 < $l2 );
+    return 0 if ( $l1 > $r2 );
+    return 1;
+
+}
+
 42;
 __END__
 =head1 NAME
